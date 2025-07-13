@@ -1,0 +1,158 @@
+{
+    "version": 3,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 25,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "windows-base",
+            "hidden": true,
+            "generator": "Visual Studio 17 2022",
+            "architecture": "x64",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            },
+            "cacheVariables": {
+                "CMAKE_CXX_STANDARD": "23",
+                "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "BUILD_TESTING": "ON",
+                "BUILD_QT_APP": "ON"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                    "hostOS": ["Windows"]
+                }
+            }
+        },
+        {
+            "name": "linux-base",
+            "hidden": true,
+            "generator": "Ninja",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            },
+            "cacheVariables": {
+                "CMAKE_CXX_STANDARD": "23",
+                "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "CMAKE_CXX_COMPILER": "g++",
+                "CMAKE_C_COMPILER": "gcc"
+            }
+        },
+        {
+            "name": "windows-debug",
+            "displayName": "Windows Debug",
+            "description": "Debug build for Windows using Visual Studio 2022",
+            "inherits": "windows-base",
+            "binaryDir": "${sourceDir}/build/windows-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_DEBUG_POSTFIX": "d"
+            }
+        },
+        {
+            "name": "windows-release",
+            "displayName": "Windows Release",
+            "description": "Release build for Windows using Visual Studio 2022",
+            "inherits": "windows-base",
+            "binaryDir": "${sourceDir}/build/windows-release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "linux-debug",
+            "displayName": "Linux Debug",
+            "description": "Debug build for Linux using GCC and Ninja",
+            "inherits": "linux-base",
+            "binaryDir": "${sourceDir}/build/linux-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_DEBUG_POSTFIX": "d",
+                "CMAKE_CXX_FLAGS_DEBUG": "-g -O0 -Wall -Wextra -Wpedantic"
+            }
+        },
+        {
+            "name": "linux-release",
+            "displayName": "Linux Release",
+            "description": "Release build for Linux using GCC and Ninja",
+            "inherits": "linux-base",
+            "binaryDir": "${sourceDir}/build/linux-release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG -march=native"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "windows-debug",
+            "displayName": "Windows Debug Build",
+            "configurePreset": "windows-debug",
+            "configuration": "Debug",
+            "verbose": true
+        },
+        {
+            "name": "windows-release",
+            "displayName": "Windows Release Build",
+            "configurePreset": "windows-release",
+            "configuration": "Release",
+            "verbose": false
+        },
+        {
+            "name": "linux-debug",
+            "displayName": "Linux Debug Build",
+            "configurePreset": "linux-debug",
+            "verbose": true
+        },
+        {
+            "name": "linux-release",
+            "displayName": "Linux Release Build",
+            "configurePreset": "linux-release",
+            "verbose": false
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "windows-debug-test",
+            "displayName": "Windows Debug Tests",
+            "configurePreset": "windows-debug",
+            "configuration": "Debug",
+            "output": {
+                "outputOnFailure": true
+            }
+        },
+        {
+            "name": "windows-release-test",
+            "displayName": "Windows Release Tests",
+            "configurePreset": "windows-release",
+            "configuration": "Release",
+            "output": {
+                "outputOnFailure": true
+            }
+        },
+        {
+            "name": "linux-debug-test",
+            "displayName": "Linux Debug Tests",
+            "configurePreset": "linux-debug",
+            "output": {
+                "outputOnFailure": true
+            }
+        },
+        {
+            "name": "linux-release-test",
+            "displayName": "Linux Release Tests",
+            "configurePreset": "linux-release",
+            "output": {
+                "outputOnFailure": true
+            }
+        }
+    ]
+}

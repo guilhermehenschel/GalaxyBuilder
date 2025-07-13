@@ -1,0 +1,219 @@
+; Galaxy Builder Windows Installer Script
+; This script creates a Windows installer using NSIS
+
+!include "MUI2.nsh"
+!include "WinVer.nsh"
+!include "FileFunc.nsh"
+
+!insertmacro GetSize
+
+; Application information
+!define APP_NAME "Galaxy Builder"
+!define APP_VERSION "@INSTALLER_VERSION@"
+!define APP_PUBLISHER "Galaxy Builder Team"
+!define APP_URL "https://github.com/galaxybuilder/galaxybuilder"
+!define APP_EXECUTABLE "GalaxyBuilder.exe"
+
+; Installer information
+Name "${APP_NAME}"
+OutFile "@INSTALLER_BUILD_DIR@/GalaxyBuilder-${APP_VERSION}-Setup.exe"
+InstallDir "$PROGRAMFILES64\${APP_NAME}"
+InstallDirRegKey HKLM "Software\${APP_NAME}" "InstallDir"
+RequestExecutionLevel admin
+
+; Version information
+VIProductVersion "${APP_VERSION}.0"
+VIAddVersionKey "ProductName" "${APP_NAME}"
+VIAddVersionKey "ProductVersion" "${APP_VERSION}"
+VIAddVersionKey "CompanyName" "${APP_PUBLISHER}"
+VIAddVersionKey "FileDescription" "${APP_NAME} Installer"
+VIAddVersionKey "LegalCopyright" "© 2025 ${APP_PUBLISHER}"
+
+; Modern UI configuration
+!define MUI_ABORTWARNING
+; !define MUI_ICON "@INSTALLER_SOURCE_DIR@/installer/windows/app.ico"
+; !define MUI_UNICON "@INSTALLER_SOURCE_DIR@/installer/windows/app.ico"
+!define MUI_HEADERIMAGE
+; !define MUI_HEADERIMAGE_BITMAP "@INSTALLER_SOURCE_DIR@/installer/windows/header.bmp"
+; !define MUI_WELCOMEFINISHPAGE_BITMAP "@INSTALLER_SOURCE_DIR@/installer/windows/welcome.bmp"
+
+; Installer pages
+!insertmacro MUI_PAGE_WELCOME
+; !insertmacro MUI_PAGE_LICENSE "@INSTALLER_SOURCE_DIR@/LICENSE"
+!insertmacro MUI_PAGE_COMPONENTS
+!insertmacro MUI_PAGE_DIRECTORY
+!insertmacro MUI_PAGE_INSTFILES
+!insertmacro MUI_PAGE_FINISH
+
+; Uninstaller pages
+!insertmacro MUI_UNPAGE_WELCOME
+!insertmacro MUI_UNPAGE_CONFIRM
+!insertmacro MUI_UNPAGE_INSTFILES
+!insertmacro MUI_UNPAGE_FINISH
+
+; Languages
+!insertmacro MUI_LANGUAGE "English"
+
+; Installer sections
+Section "Core Application" SecCore
+    SectionIn RO  ; Read-only section
+    
+    ; Set output path
+    SetOutPath "$INSTDIR"
+    
+    ; Install main executable
+    File "@INSTALLER_BINARY_DIR@/${APP_EXECUTABLE}"
+    
+    ; Install Qt6 libraries
+    File "@INSTALLER_BINARY_DIR@/Qt6Core.dll"
+    File "@INSTALLER_BINARY_DIR@/Qt6Gui.dll"
+    File "@INSTALLER_BINARY_DIR@/Qt6Widgets.dll"
+    
+    ; Install Visual C++ Redistributable libraries
+    File /nonfatal "@INSTALLER_BINARY_DIR@/msvcp*.dll"
+    File /nonfatal "@INSTALLER_BINARY_DIR@/vcruntime*.dll"
+    File /nonfatal "@INSTALLER_BINARY_DIR@/vccorlib*.dll"
+    
+    ; Create platforms directory and install Qt6 platform plugins
+    CreateDirectory "$INSTDIR\platforms"
+    SetOutPath "$INSTDIR\platforms"
+    File "@INSTALLER_BINARY_DIR@/platforms/qwindows.dll"
+    
+    ; Create styles directory and install Qt6 style plugins
+    CreateDirectory "$INSTDIR\styles"
+    SetOutPath "$INSTDIR\styles"
+    File /nonfatal "@INSTALLER_BINARY_DIR@/styles/*.dll"
+    
+    ; Create imageformats directory and install Qt6 imageformat plugins
+    CreateDirectory "$INSTDIR\imageformats"
+    SetOutPath "$INSTDIR\imageformats"
+    File /nonfatal "@INSTALLER_BINARY_DIR@/imageformats/*.dll"
+    
+    ; Install resources
+    SetOutPath "$INSTDIR"
+    File /r "@INSTALLER_SOURCE_DIR@/resources"
+    
+    ; Create uninstaller
+    WriteUninstaller "$INSTDIR\Uninstall.exe"
+    
+    ; Write registry keys
+    WriteRegStr HKLM "Software\${APP_NAME}" "InstallDir" "$INSTDIR"
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "DisplayName" "${APP_NAME}"
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "DisplayVersion" "${APP_VERSION}"
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "Publisher" "${APP_PUBLISHER}"
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "URLInfoAbout" "${APP_URL}"
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "UninstallString" "$INSTDIR\Uninstall.exe"
+    WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "NoModify" 1
+    WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "NoRepair" 1
+    
+    ; Calculate installed size
+    ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
+    IntFmt $0 "0x%08X" $0
+    WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "EstimatedSize" "$0"
+    
+SectionEnd
+
+Section "Desktop Shortcut" SecDesktop
+    CreateShortcut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\${APP_EXECUTABLE}" "" "$INSTDIR\${APP_EXECUTABLE}" 0
+SectionEnd
+
+Section "Start Menu Shortcuts" SecStartMenu
+    CreateDirectory "$SMPROGRAMS\${APP_NAME}"
+    CreateShortcut "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk" "$INSTDIR\${APP_EXECUTABLE}" "" "$INSTDIR\${APP_EXECUTABLE}" 0
+    CreateShortcut "$SMPROGRAMS\${APP_NAME}\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
+SectionEnd
+
+Section "File Associations" SecFileAssoc
+    ; Register .galaxy file extension
+    WriteRegStr HKCR ".galaxy" "" "GalaxyBuilder.File"
+    WriteRegStr HKCR "GalaxyBuilder.File" "" "Galaxy Builder File"
+    WriteRegStr HKCR "GalaxyBuilder.File\DefaultIcon" "" "$INSTDIR\${APP_EXECUTABLE},0"
+    WriteRegStr HKCR "GalaxyBuilder.File\shell\open\command" "" '"$INSTDIR\${APP_EXECUTABLE}" "%1"'
+    
+    ; Notify Windows of file association changes
+    System::Call 'shell32.dll::SHChangeNotify(i, i, i, i) v (0x08000000, 0, 0, 0)'
+SectionEnd
+
+; Section descriptions
+LangString DESC_SecCore ${LANG_ENGLISH} "Core application files (required)"
+LangString DESC_SecDesktop ${LANG_ENGLISH} "Create a desktop shortcut"
+LangString DESC_SecStartMenu ${LANG_ENGLISH} "Create Start Menu shortcuts"
+LangString DESC_SecFileAssoc ${LANG_ENGLISH} "Associate .galaxy files with Galaxy Builder"
+
+!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+    !insertmacro MUI_DESCRIPTION_TEXT ${SecCore} $(DESC_SecCore)
+    !insertmacro MUI_DESCRIPTION_TEXT ${SecDesktop} $(DESC_SecDesktop)
+    !insertmacro MUI_DESCRIPTION_TEXT ${SecStartMenu} $(DESC_SecStartMenu)
+    !insertmacro MUI_DESCRIPTION_TEXT ${SecFileAssoc} $(DESC_SecFileAssoc)
+!insertmacro MUI_FUNCTION_DESCRIPTION_END
+
+; Uninstaller section
+Section "Uninstall"
+    ; Remove files
+    Delete "$INSTDIR\${APP_EXECUTABLE}"
+    Delete "$INSTDIR\Qt6Core.dll"
+    Delete "$INSTDIR\Qt6Gui.dll"
+    Delete "$INSTDIR\Qt6Widgets.dll"
+    Delete "$INSTDIR\msvcp*.dll"
+    Delete "$INSTDIR\vcruntime*.dll"
+    Delete "$INSTDIR\vccorlib*.dll"
+    
+    ; Remove directories
+    RMDir /r "$INSTDIR\platforms"
+    RMDir /r "$INSTDIR\styles"
+    RMDir /r "$INSTDIR\imageformats"
+    RMDir /r "$INSTDIR\resources"
+    
+    ; Remove shortcuts
+    Delete "$DESKTOP\${APP_NAME}.lnk"
+    RMDir /r "$SMPROGRAMS\${APP_NAME}"
+    
+    ; Remove file associations
+    DeleteRegKey HKCR ".galaxy"
+    DeleteRegKey HKCR "GalaxyBuilder.File"
+    
+    ; Remove registry keys
+    DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}"
+    DeleteRegKey HKLM "Software\${APP_NAME}"
+    
+    ; Remove uninstaller
+    Delete "$INSTDIR\Uninstall.exe"
+    
+    ; Remove installation directory if empty
+    RMDir "$INSTDIR"
+    
+    ; Notify Windows of file association changes
+    System::Call 'shell32.dll::SHChangeNotify(i, i, i, i) v (0x08000000, 0, 0, 0)'
+SectionEnd
+
+; Functions
+Function .onInit
+    ; Check Windows version
+    ${IfNot} ${AtLeastWin10}
+        MessageBox MB_OK|MB_ICONSTOP "This application requires Windows 10 or later."
+        Abort
+    ${EndIf}
+    
+    ; Check if already installed
+    ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "UninstallString"
+    StrCmp $R0 "" done
+    
+    MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
+        "${APP_NAME} is already installed. $\n$\nClick 'OK' to remove the previous version or 'Cancel' to cancel this upgrade." \
+        IDOK uninst
+    Abort
+    
+uninst:
+    ClearErrors
+    ExecWait '$R0 _?=$INSTDIR'
+    
+    IfErrors no_remove_uninstaller done
+    no_remove_uninstaller:
+    
+done:
+FunctionEnd
+
+Function un.onInit
+    MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Are you sure you want to completely remove ${APP_NAME} and all of its components?" IDYES +2
+    Abort
+FunctionEnd

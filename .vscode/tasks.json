@@ -1,0 +1,144 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Configure Debug",
+			"type": "shell",
+			"command": "cmake",
+			"args": ["--preset", "windows-debug"],
+			"group": "build",
+			"problemMatcher": ["$gcc"],
+			"detail": "Configure CMake for Debug build"
+		},
+		{
+			"label": "Configure Release",
+			"type": "shell",
+			"command": "cmake",
+			"args": ["--preset", "windows-release"],
+			"group": "build",
+			"problemMatcher": ["$gcc"],
+			"detail": "Configure CMake for Release build"
+		},
+		{
+			"label": "Build Debug",
+			"type": "shell",
+			"command": "cmake",
+			"args": ["--build", "build/windows-debug", "--config", "Debug"],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"dependsOn": "Configure Debug",
+			"problemMatcher": ["$msCompile"],
+			"detail": "Build Debug configuration"
+		},
+		{
+			"label": "Build Release",
+			"type": "shell",
+			"command": "cmake",
+			"args": ["--build", "build/windows-release", "--config", "Release"],
+			"group": "build",
+			"dependsOn": "Configure Release",
+			"problemMatcher": ["$msCompile"],
+			"detail": "Build Release configuration"
+		},
+		{
+			"label": "Build Galaxy Builder",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-ExecutionPolicy",
+				"Bypass",
+				"-File",
+				".\\build.ps1"
+			],
+			"group": "build",
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "Build Debug (PowerShell)",
+			"type": "shell",
+			"command": "powershell",
+			"args": ["-ExecutionPolicy", "Bypass", "-File", "./build.ps1", "-BuildType", "Debug"],
+			"group": "build",
+			"problemMatcher": ["$msCompile"],
+			"detail": "Build Debug using PowerShell script"
+		},
+		{
+			"label": "Build Release (PowerShell)",
+			"type": "shell",
+			"command": "powershell",
+			"args": ["-ExecutionPolicy", "Bypass", "-File", "./build.ps1", "-BuildType", "Release"],
+			"group": "build",
+			"problemMatcher": ["$msCompile"],
+			"detail": "Build Release using PowerShell script"
+		},
+		{
+			"label": "Configure Debug (Linux)",
+			"type": "shell",
+			"command": "cmake",
+			"args": ["--preset", "linux-debug"],
+			"group": "build",
+			"problemMatcher": ["$gcc"],
+			"detail": "Configure CMake for Debug build on Linux"
+		},
+		{
+			"label": "Configure Release (Linux)",
+			"type": "shell",
+			"command": "cmake",
+			"args": ["--preset", "linux-release"],
+			"group": "build",
+			"problemMatcher": ["$gcc"],
+			"detail": "Configure CMake for Release build on Linux"
+		},
+		{
+			"label": "Build Debug (Linux)",
+			"type": "shell",
+			"command": "cmake",
+			"args": ["--build", "build/linux-debug"],
+			"group": "build",
+			"dependsOn": "Configure Debug (Linux)",
+			"problemMatcher": ["$gcc"],
+			"detail": "Build Debug configuration on Linux"
+		},
+		{
+			"label": "Build Release (Linux)",
+			"type": "shell",
+			"command": "cmake",
+			"args": ["--build", "build/linux-release"],
+			"group": "build",
+			"dependsOn": "Configure Release (Linux)",
+			"problemMatcher": ["$gcc"],
+			"detail": "Build Release configuration on Linux"
+		},
+		{
+			"label": "Clean All",
+			"type": "shell",
+			"command": "powershell",
+			"args": ["-Command", "Remove-Item -Recurse -Force build -ErrorAction SilentlyContinue"],
+			"group": "build",
+			"detail": "Clean all build directories"
+		},
+		{
+			"label": "Run Debug",
+			"type": "shell",
+			"command": "${workspaceFolder}/build/windows-debug/bin/GalaxyBuilderd.exe",
+			"args": [],
+			"group": "test",
+			"dependsOn": "Build Debug",
+			"detail": "Run Debug executable"
+		},
+		{
+			"label": "Run Release",
+			"type": "shell",
+			"command": "${workspaceFolder}/build/windows-release/bin/GalaxyBuilder.exe",
+			"args": [],
+			"group": "test",
+			"dependsOn": "Build Release",
+			"detail": "Run Release executable"
+		}
+	]
+}

@@ -1,0 +1,277 @@
+# Galaxy Builder .gitignore
+
+# Build directories
+build/
+build-*/
+out/
+bin/
+lib/
+install/
+
+# CMake generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+compile_commands.json
+.cmake/
+
+# Qt generated files
+*.pro.user*
+*.qmlc
+*.jsc
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+ui_*.h
+*.qm
+.qmake.cache
+.qmake.stash
+
+# C++ build artifacts
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.pdb
+*.ilk
+*.exp
+*.map
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Static analysis
+*.sarif
+
+# Visual Studio / VS Code
+.vs/
+.vscode/settings.json.user
+.vscode/launch.json.user
+.vscode/tasks.json.user
+*.vcxproj.user
+*.vcxproj.filters
+*.vcxproj
+*.sln
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code workspace settings (keep main config, ignore user-specific)
+# .vscode/settings.json  # Uncomment if you want to ignore VS Code settings
+.vscode/c_cpp_properties.json
+
+# JetBrains IDEs (CLion, etc.)
+.idea/
+*.iws
+*.iml
+*.ipr
+cmake-build-*/
+
+# Qt Creator
+*.pro.user*
+*.qtcreator
+*.qbs.user
+*.qbs.user.*
+
+# Eclipse CDT
+.project
+.cproject
+.settings/
+
+# Xcode
+*.xcodeproj/
+*.xcworkspace/
+
+# Conan package manager
+conanfile.txt
+conandata.yml
+test_package/
+conanbuildinfo.*
+conan.lock
+
+# vcpkg
+vcpkg_installed/
+.vcpkg-root
+
+# Package managers
+node_modules/
+.npm/
+
+# Operating System files
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.#*
+\#*#
+
+# Archives
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Backup files
+*.bak
+*.backup
+*.old
+*.orig
+
+# Generated documentation
+doc/html/
+doc/latex/
+docs/_build/
+doxygen_output/
+
+# Test results and coverage
+Testing/
+test_results/
+coverage/
+*.gcov
+*.gcda
+*.gcno
+lcov.info
+
+# Profiling data
+*.prof
+gmon.out
+callgrind.out.*
+massif.out.*
+
+# Dependency directories
+external/
+dependencies/
+vendor/
+
+# Custom build scripts output
+*.out
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Certificates and keys
+*.pem
+*.key
+*.crt
+*.cert
+*.p12
+*.pfx
+
+# Configuration files with sensitive data
+config.ini
+settings.ini
+secrets.json
+
+# Galaxy Builder specific
+galaxy_*.png
+exported_galaxies/
+user_settings.json
+cache/
+
+# Temporary Qt files
+*.autosave
+*.tmp
+
+# Core dumps
+core
+core.*
+vgcore.*
+
+# Memory debugging
+*.asan
+*.msan
+*.tsan
+*.ubsan
+
+# Static analysis tools
+.clang-tidy
+.clang-format
+cppcheck-build-dir/
+
+# Ninja build files
+.ninja_deps
+.ninja_log
+
+# Makefiles (if generated)
+Makefile
+makefile
+
+# CPack generated files
+_CPack_Packages/
+*.rpm
+*.deb
+*.dmg
+
+# Installation packages
+*.msi
+*.pkg
+*.app/
+
+# Local development files
+TODO.md
+NOTES.md
+scratch/
+experiments/

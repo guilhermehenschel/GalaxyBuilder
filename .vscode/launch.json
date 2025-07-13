@@ -1,0 +1,79 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch Galaxy Builder (Windows Debug)",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/windows-debug/bin/GalaxyBuilder.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/build/windows-debug/bin",
+            "environment": [
+                {
+                    "name": "QML_IMPORT_TRACE",
+                    "value": "1"
+                },
+                {
+                    "name": "QT_LOGGING_RULES",
+                    "value": "qt.qml.debug=true"
+                }
+            ],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Launch Galaxy Builder (Windows Release)",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/windows-release/bin/GalaxyBuilder.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/build/windows-release/bin",
+            "environment": [],
+            "console": "integratedTerminal",
+            "preLaunchTask": "Build Release"
+        },
+        {
+            "name": "Launch Galaxy Builder (Linux Debug)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/linux-debug/bin/GalaxyBuilder",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/build/linux-debug/bin",
+            "environment": [
+                {
+                    "name": "QML_IMPORT_TRACE",
+                    "value": "1"
+                },
+                {
+                    "name": "QT_LOGGING_RULES",
+                    "value": "qt.qml.debug=true"
+                }
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build Debug (Linux)"
+        },
+        {
+            "name": "Launch Galaxy Builder (Linux Release)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/linux-release/bin/GalaxyBuilder",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/build/linux-release/bin",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "preLaunchTask": "Build Release (Linux)"
+        }
+    ]
+}

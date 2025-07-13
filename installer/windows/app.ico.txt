@@ -1,0 +1,3 @@
+# Placeholder for installer icon
+# To create a proper installer, replace this with a real .ico file
+# The icon should be 32x32 pixels and saved as app.ico

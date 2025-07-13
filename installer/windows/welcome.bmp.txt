@@ -1,0 +1,3 @@
+# Placeholder for installer welcome image
+# To create a proper installer, replace this with a real .bmp file
+# The welcome image should be 164x314 pixels and saved as welcome.bmp

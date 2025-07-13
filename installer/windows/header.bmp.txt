@@ -1,0 +1,3 @@
+# Placeholder for installer header image
+# To create a proper installer, replace this with a real .bmp file
+# The header image should be 150x57 pixels and saved as header.bmp
