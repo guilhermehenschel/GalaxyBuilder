@@ -295,6 +295,19 @@ void GalaxyController::selectSystemAt(const QPointF& position)
 
 void GalaxyController::onGenerationFinished()
 {
+    // Set up models if they don't exist
+    if (m_galaxy && !m_galaxy->systemsModel()) {
+        auto* systemsModel = new StarSystemListModel(this);
+        systemsModel->setSystems(&m_galaxy->getSystems());
+        m_galaxy->setSystemsModel(systemsModel);
+    }
+    
+    if (m_galaxy && !m_galaxy->lanesModel()) {
+        auto* lanesModel = new TravelLaneListModel(this);
+        lanesModel->setLanes(&m_galaxy->getTravelLanes());
+        m_galaxy->setLanesModel(lanesModel);
+    }
+    
     setIsGenerating(false);
     setStatusMessage("Galaxy generation completed");
     emit galaxyChanged();

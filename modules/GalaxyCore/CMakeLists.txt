@@ -20,6 +20,7 @@ set(GALAXY_CORE_SOURCES
     StarSystem.cpp
     StarSystemQml.cpp
     Planet.cpp
+    PlanetListModel.cpp
     TravelLane.cpp
     Galaxy.cpp
     GalaxyGenerator.cpp
@@ -28,6 +29,8 @@ set(GALAXY_CORE_SOURCES
     TravelLaneListModel.cpp
     SystemDataManager.cpp
     XmlValidator.cpp
+    SystemPropertiesViewModel.cpp
+    ImportExportViewModel.cpp
 )
 
 # Core library header files
@@ -36,6 +39,7 @@ set(GALAXY_CORE_HEADERS
     StarSystem.h
     StarSystemQml.h
     Planet.h
+    PlanetListModel.h
     TravelLane.h
     Galaxy.h
     GalaxyGenerator.h
@@ -44,6 +48,8 @@ set(GALAXY_CORE_HEADERS
     TravelLaneListModel.h
     SystemDataManager.h
     galaxycore_global.h
+    SystemPropertiesViewModel.h
+    ImportExportViewModel.h
 )
 
 # Create the core library

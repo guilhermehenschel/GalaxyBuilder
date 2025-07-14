@@ -7,9 +7,6 @@ import GalaxyCore 1.0
 ApplicationWindow {
     id: window
     
-    property SystemDataManager dataManager: galaxyController ? galaxyController.systemDataManager : null
-    property var selectedSystems: []
-    
     title: "Galaxy Import/Export Manager"
     width: 900
     height: 700
@@ -18,6 +15,22 @@ ApplicationWindow {
     modality: Qt.ApplicationModal
     
     color: "#1a1a1a"
+    
+    // MVVM ViewModel
+    ImportExportViewModel {
+        id: viewModel
+        
+        Component.onCompleted: {
+            // Set data manager from global context
+            if (galaxyController && galaxyController.systemDataManager) {
+                setDataManager(galaxyController.systemDataManager)
+            }
+            // Initialize available systems
+            if (galaxyController && galaxyController.systemsModel) {
+                setSystemsModel(galaxyController.systemsModel)
+            }
+        }
+    }
     
     ColumnLayout {
         anchors.fill: parent
@@ -94,7 +107,7 @@ ApplicationWindow {
                     Item { Layout.fillWidth: true }
                     
                     Text {
-                        text: "Selected: " + selectedSystems.length + " systems"
+                        text: "Selected: " + viewModel.selectedCount + " systems"
                         color: "#cccccc"
                     }
                 }
@@ -109,26 +122,23 @@ ApplicationWindow {
                         model: galaxyController ? galaxyController.systemsModel : null
                         
                         function selectAll() {
-                            selectedSystems = []
+                            viewModel.selectAllSystems()
                             for (var i = 0; i < count; i++) {
                                 var item = itemAtIndex(i)
                                 if (item) {
                                     item.selected = true
-                                    selectedSystems.push(model.data(model.index(i, 0), Qt.UserRole))
                                 }
                             }
-                            selectedSystemsChanged()
                         }
                         
                         function clearSelection() {
-                            selectedSystems = []
+                            viewModel.clearSelection()
                             for (var i = 0; i < count; i++) {
                                 var item = itemAtIndex(i)
                                 if (item) {
                                     item.selected = false
                                 }
                             }
-                            selectedSystemsChanged()
                         }
                         
                         delegate: Rectangle {
@@ -148,16 +158,10 @@ ApplicationWindow {
                                     
                                     var system = model.starSystem
                                     if (parent.selected) {
-                                        if (selectedSystems.indexOf(system) === -1) {
-                                            selectedSystems.push(system)
-                                        }
+                                        viewModel.selectSystem(system)
                                     } else {
-                                        var index = selectedSystems.indexOf(system)
-                                        if (index !== -1) {
-                                            selectedSystems.splice(index, 1)
-                                        }
+                                        viewModel.deselectSystem(system)
                                     }
-                                    window.selectedSystemsChanged()
                                 }
                             }
                             
@@ -193,7 +197,9 @@ ApplicationWindow {
                                     }
                                     
                                     Text {
-                                        text: "Position: (" + model.positionX.toFixed(1) + ", " + model.positionY.toFixed(1) + ")"
+                                        text: "Position: (" + 
+                                              (model.positionX !== undefined ? model.positionX.toFixed(1) : "0.0") + ", " + 
+                                              (model.positionY !== undefined ? model.positionY.toFixed(1) : "0.0") + ")"
                                         color: "#cccccc"
                                         font.pixelSize: 10
                                     }
@@ -237,7 +243,7 @@ ApplicationWindow {
                 Button {
                     Layout.fillWidth: true
                     text: "Export Selected Systems"
-                    enabled: selectedSystems.length > 0
+                    enabled: viewModel.selectedCount > 0
                     background: Rectangle {
                         color: enabled ? "#006600" : "#333333"
                         border.color: enabled ? "#008800" : "#555555"
@@ -364,13 +370,10 @@ ApplicationWindow {
         folder: Platform.StandardPaths.writableLocation(Platform.StandardPaths.DocumentsLocation)
         
         onAccepted: {
-            if (dataManager && selectedSystems.length > 0) {
-                var success = dataManager.exportGalaxyToXml(selectedSystems, file)
-                if (success) {
-                    statusText.text = "Exported " + selectedSystems.length + " systems successfully"
-                } else {
-                    statusText.text = "Export failed"
-                }
+            if (viewModel.hasDataManager() && viewModel.selectedCount > 0) {
+                viewModel.exportSelectedSystems(file.toString())
+            } else {
+                statusText.text = "Error: Cannot export - no systems selected or missing data manager"
             }
         }
     }
@@ -384,24 +387,10 @@ ApplicationWindow {
         folder: Platform.StandardPaths.writableLocation(Platform.StandardPaths.DocumentsLocation)
         
         onAccepted: {
-            if (dataManager && galaxyController && galaxyController.galaxy) {
-                var allSystems = []
-                var model = galaxyController.systemsModel
-                if (model) {
-                    for (var i = 0; i < model.rowCount(); i++) {
-                        var system = model.data(model.index(i, 0), Qt.UserRole)
-                        if (system) {
-                            allSystems.push(system)
-                        }
-                    }
-                }
-                
-                var success = dataManager.exportGalaxyToXml(allSystems, file)
-                if (success) {
-                    statusText.text = "Exported " + allSystems.length + " systems successfully"
-                } else {
-                    statusText.text = "Export failed"
-                }
+            if (viewModel.hasDataManager()) {
+                viewModel.exportAllSystems(file.toString())
+            } else {
+                statusText.text = "Error: Cannot export - missing data manager"
             }
         }
     }
@@ -414,14 +403,10 @@ ApplicationWindow {
         folder: Platform.StandardPaths.writableLocation(Platform.StandardPaths.DocumentsLocation)
         
         onAccepted: {
-            if (dataManager) {
-                var systems = dataManager.importGalaxyFromXml(file)
-                if (systems.length > 0) {
-                    statusText.text = "Imported " + systems.length + " systems successfully"
-                    // Note: In a full implementation, you'd want to integrate these systems into the current galaxy
-                } else {
-                    statusText.text = "Import failed or no systems found"
-                }
+            if (viewModel.hasDataManager()) {
+                viewModel.importGalaxy(file.toString())
+            } else {
+                statusText.text = "Error: Cannot import - missing data manager"
             }
         }
     }
@@ -434,53 +419,52 @@ ApplicationWindow {
         folder: Platform.StandardPaths.writableLocation(Platform.StandardPaths.DocumentsLocation)
         
         onAccepted: {
-            if (dataManager) {
-                var system = dataManager.importSystemFromXml(file)
-                if (system) {
-                    statusText.text = "Imported system: " + system.name
-                    // Note: In a full implementation, you'd want to integrate this system into the current galaxy
-                } else {
-                    statusText.text = "Import failed"
-                }
+            if (viewModel.hasDataManager()) {
+                viewModel.importSystem(file.toString())
+            } else {
+                statusText.text = "Error: Cannot import - missing data manager"
             }
         }
     }
     
-    // Component initialization
-    Component.onCompleted: {
-        if (dataManager) {
-            // Connect to data manager signals for feedback
-            dataManager.systemExported.connect(function(filePath) {
-                statusText.text = "Exported to: " + filePath
-            })
-            dataManager.systemImported.connect(function(filePath) {
-                statusText.text = "Imported from: " + filePath
-            })
-            dataManager.exportError.connect(function(message) {
-                statusText.text = "Export error: " + message
-            })
-            dataManager.importError.connect(function(message) {
-                statusText.text = "Import error: " + message
-            })
+    // Connect to ViewModel signals for status updates
+    Connections {
+        target: viewModel
+        function onStatusMessageChanged() {
+            statusText.text = viewModel.statusMessage
+        }
+        function onExportCompleted(success, filePath, systemCount) {
+            if (success) {
+                statusText.text = "Successfully exported " + systemCount + " systems to " + filePath
+            } else {
+                statusText.text = "Export failed: " + filePath
+            }
+        }
+        function onImportCompleted(success, filePath, systemCount) {
+            if (success) {
+                statusText.text = "Successfully imported " + systemCount + " systems from " + filePath
+            } else {
+                statusText.text = "Import failed: " + filePath
+            }
         }
     }
     
     // Helper functions
     function getStarColor(type) {
         switch(type) {
-            case 0: return "#9bb0ff"  // O-Class (Blue Giant)
-            case 1: return "#aabfff"  // B-Class (Blue-White)
-            case 2: return "#ffffff"  // A-Class (White)
-            case 3: return "#fff2a1"  // F-Class (Yellow-White)
-            case 4: return "#ffcc6f"  // G-Class (Yellow)
-            case 5: return "#ffab7a"  // K-Class (Orange)
-            case 6: return "#ff6961"  // M-Class (Red Dwarf)
+            case 0: return "#ff6961"  // Red Dwarf
+            case 1: return "#ffcc6f"  // Yellow Star
+            case 2: return "#9bb0ff"  // Blue Star
+            case 3: return "#ffffff"  // White Dwarf
+            case 4: return "#ffab7a"  // Red Giant
+            case 5: return "#e6e6e6"  // Neutron Star
+            case 6: return "#000000"  // Black Hole
             default: return "#ffff80" // Default/Unknown
         }
     }
     
     function getStarTypeName(type) {
-        const types = ["O-Class", "B-Class", "A-Class", "F-Class", "G-Class", "K-Class", "M-Class"]
+        const types = ["Red Dwarf", "Yellow Star", "Blue Star", "White Dwarf", "Red Giant", "Neutron Star", "Black Hole"]
         return types[type] || "Unknown"
     }
     

@@ -12,6 +12,7 @@ StarSystemQml::StarSystemQml(QObject* parent)
     , m_starMass(1.0)
     , m_starTemperature(5778.0)
     , m_starLuminosity(1.0)
+    , m_planetsModel(new PlanetListModel(this))
 {
     generateName();
     updateStarProperties();
@@ -26,6 +27,7 @@ StarSystemQml::StarSystemQml(SystemId id, const QPointF& position, StarType type
     , m_starMass(1.0)
     , m_starTemperature(5778.0)
     , m_starLuminosity(1.0)
+    , m_planetsModel(new PlanetListModel(this))
 {
     generateName();
     updateStarProperties();
@@ -95,60 +97,31 @@ void StarSystemQml::setStarLuminosity(double luminosity) {
 }
 
 Planet* StarSystemQml::addPlanet() {
-    auto* planet = new Planet(this);
-    planet->setName(QString("Planet %1").arg(m_planets.size() + 1));
-    planet->setOrbitDistance(50.0 + m_planets.size() * 30.0); // Default spacing
-    m_planets.append(planet);
-    emit planetsChanged();
-    return planet;
+    return m_planetsModel->addPlanet();
 }
 
 Planet* StarSystemQml::addPlanet(const QString& name, double orbitDistance) {
-    auto* planet = new Planet(this);
-    planet->setName(name);
-    planet->setOrbitDistance(orbitDistance);
-    m_planets.append(planet);
-    emit planetsChanged();
-    return planet;
+    return m_planetsModel->addPlanet(name, orbitDistance);
 }
 
 bool StarSystemQml::removePlanet(Planet* planet) {
-    if (!planet) return false;
-    
-    int index = m_planets.indexOf(planet);
-    if (index >= 0) {
-        m_planets.removeAt(index);
-        planet->deleteLater();
-        emit planetsChanged();
-        return true;
-    }
-    return false;
+    return m_planetsModel->removePlanet(planet);
 }
 
 bool StarSystemQml::removePlanetAt(int index) {
-    if (index < 0 || index >= m_planets.size()) return false;
-    
-    Planet* planet = m_planets.takeAt(index);
-    planet->deleteLater();
-    emit planetsChanged();
-    return true;
+    return m_planetsModel->removePlanetAt(index);
 }
 
 Planet* StarSystemQml::getPlanetAt(int index) const {
-    if (index < 0 || index >= m_planets.size()) return nullptr;
-    return m_planets.at(index);
+    return m_planetsModel->getPlanetAt(index);
 }
 
 int StarSystemQml::getPlanetCount() const {
-    return m_planets.size();
+    return m_planetsModel->getPlanetCount();
 }
 
 void StarSystemQml::clearPlanets() {
-    for (Planet* planet : m_planets) {
-        planet->deleteLater();
-    }
-    m_planets.clear();
-    emit planetsChanged();
+    m_planetsModel->clearPlanets();
 }
 
 double StarSystemQml::distanceTo(const StarSystemQml& other) const {

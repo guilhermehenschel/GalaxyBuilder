@@ -2,6 +2,7 @@
 
 #include "Common.h"
 #include "Planet.h"
+#include "PlanetListModel.h"
 #include "galaxycore_global.h"
 #include <QObject>
 #include <QQmlEngine>
@@ -23,7 +24,7 @@ class GALAXYCORE_EXPORT StarSystemQml : public QObject {
     Q_PROPERTY(double starMass READ getStarMass WRITE setStarMass NOTIFY starMassChanged)
     Q_PROPERTY(double starTemperature READ getStarTemperature WRITE setStarTemperature NOTIFY starTemperatureChanged)
     Q_PROPERTY(double starLuminosity READ getStarLuminosity WRITE setStarLuminosity NOTIFY starLuminosityChanged)
-    Q_PROPERTY(QList<Planet*> planets READ getPlanets NOTIFY planetsChanged)
+    Q_PROPERTY(PlanetListModel* planetsModel READ getPlanetsModel CONSTANT)
 
 public:
     explicit StarSystemQml(QObject* parent = nullptr);
@@ -41,7 +42,7 @@ public:
     double getStarMass() const noexcept { return m_starMass; }
     double getStarTemperature() const noexcept { return m_starTemperature; }
     double getStarLuminosity() const noexcept { return m_starLuminosity; }
-    const QList<Planet*>& getPlanets() const noexcept { return m_planets; }
+    PlanetListModel* getPlanetsModel() const noexcept { return m_planetsModel; }
 
     // Setters
     void setPosition(const QPointF& position);
@@ -73,7 +74,6 @@ signals:
     void starMassChanged();
     void starTemperatureChanged();
     void starLuminosityChanged();
-    void planetsChanged();
 
 private:
     SystemId m_id;
@@ -84,7 +84,7 @@ private:
     double m_starMass;
     double m_starTemperature;
     double m_starLuminosity;
-    QList<Planet*> m_planets;
+    PlanetListModel* m_planetsModel;
 
     void generateName();
     void updateStarProperties();

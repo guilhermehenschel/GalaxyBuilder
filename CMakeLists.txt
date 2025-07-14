@@ -5,7 +5,7 @@ project(GalaxyBuilder
     VERSION 1.0.0 
     LANGUAGES CXX
     DESCRIPTION "Stellaris-style procedural galaxy map generator"
-    HOMEPAGE_URL "https://github.com/galaxybuilder/galaxybuilder"
+    HOMEPAGE_URL "https://github.com/guilhermehenschel/GalaxyBuilder"
 )
 
 # Build options

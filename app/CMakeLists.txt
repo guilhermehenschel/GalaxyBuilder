@@ -47,6 +47,7 @@ qt_add_qml_module(GalaxyBuilderApp
         qml/components/SystemPropertiesManager.qml
         qml/components/GalaxyManager.qml
         qml/views/GalaxyView.qml
+        qml/components/PlanetPropertyView.qml
 )
 
 # Link against Qt6 and GalaxyCore

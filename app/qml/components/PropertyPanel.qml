@@ -274,13 +274,13 @@ Rectangle {
     // Helper functions for enum display
     function getStarTypeName(type) {
         switch(type) {
-            case 0: return "O-Class (Blue Giant)"
-            case 1: return "B-Class (Blue-White)"
-            case 2: return "A-Class (White)"
-            case 3: return "F-Class (Yellow-White)"
-            case 4: return "G-Class (Yellow)"
-            case 5: return "K-Class (Orange)"
-            case 6: return "M-Class (Red Dwarf)"
+            case 0: return "Red Dwarf"
+            case 1: return "Yellow Star"
+            case 2: return "Blue Star"
+            case 3: return "White Dwarf"
+            case 4: return "Red Giant"
+            case 5: return "Neutron Star"
+            case 6: return "Black Hole"
             default: return "Unknown"
         }
     }

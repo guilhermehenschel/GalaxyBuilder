@@ -155,13 +155,13 @@ Item {
     // Helper functions for visual styling
     function getStarColor(type) {
         switch(type) {
-            case 0: return "#9bb0ff"  // O-Class (Blue Giant)
-            case 1: return "#aabfff"  // B-Class (Blue-White)
-            case 2: return "#ffffff"  // A-Class (White)
-            case 3: return "#fff2a1"  // F-Class (Yellow-White)
-            case 4: return "#ffcc6f"  // G-Class (Yellow)
-            case 5: return "#ffab7a"  // K-Class (Orange)
-            case 6: return "#ff6961"  // M-Class (Red Dwarf)
+            case 0: return "#ff6961"  // Red Dwarf
+            case 1: return "#ffcc6f"  // Yellow Star
+            case 2: return "#9bb0ff"  // Blue Star
+            case 3: return "#ffffff"  // White Dwarf
+            case 4: return "#ffab7a"  // Red Giant
+            case 5: return "#e6e6e6"  // Neutron Star
+            case 6: return "#000000"  // Black Hole
             default: return "#ffff80" // Default/Unknown
         }
     }

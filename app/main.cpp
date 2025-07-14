@@ -21,6 +21,8 @@
 #include "SystemDataManager.h"
 #include "StarSystemListModel.h"
 #include "TravelLaneListModel.h"
+#include "SystemPropertiesViewModel.h"
+#include "ImportExportViewModel.h"
 #include "Common.h"
 
 int main(int argc, char *argv[])
@@ -52,9 +54,11 @@ int main(int argc, char *argv[])
     qmlRegisterType<SystemDataManager>("GalaxyCore", 1, 0, "SystemDataManager");
     qmlRegisterType<StarSystemListModel>("GalaxyCore", 1, 0, "StarSystemListModel");
     qmlRegisterType<TravelLaneListModel>("GalaxyCore", 1, 0, "TravelLaneListModel");
+    qmlRegisterType<SystemPropertiesViewModel>("GalaxyCore", 1, 0, "SystemPropertiesViewModel");
+    qmlRegisterType<ImportExportViewModel>("GalaxyCore", 1, 0, "ImportExportViewModel");
     
-    std::cout << "Registered GalaxyController, Planet, StarSystem, SystemDataManager, StarSystemListModel, and TravelLaneListModel QML types" << std::endl;
-    qDebug() << "Registered GalaxyController, Planet, StarSystem, SystemDataManager, StarSystemListModel, and TravelLaneListModel QML types";
+    std::cout << "Registered GalaxyController, Planet, StarSystem, SystemDataManager, StarSystemListModel, TravelLaneListModel, SystemPropertiesViewModel, and ImportExportViewModel QML types" << std::endl;
+    qDebug() << "Registered GalaxyController, Planet, StarSystem, SystemDataManager, StarSystemListModel, TravelLaneListModel, SystemPropertiesViewModel, and ImportExportViewModel QML types";
     
     // Create and expose controller instance to QML
     GalaxyController controller;

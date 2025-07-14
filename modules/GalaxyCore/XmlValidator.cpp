@@ -34,7 +34,8 @@ XmlValidator::ValidationResult XmlValidator::validateFile(const QString& filePat
     QDomDocument doc;
     QString errorMsg;
     int errorLine, errorColumn;
-    if (!doc.setContent(&file, &errorMsg, &errorLine, &errorColumn)) {
+    QDomDocument::ParseResult parseResult = doc.setContent(&file, QDomDocument::ParseOption::UseNamespaceProcessing, &errorMsg, &errorLine, &errorColumn);
+    if (!parseResult) {
         result.errors << QString("XML parsing error at line %1, column %2: %3")
                                 .arg(errorLine).arg(errorColumn).arg(errorMsg);
         file.close();
@@ -64,7 +65,8 @@ XmlValidator::ValidationResult XmlValidator::validateXmlString(const QString& xm
     QDomDocument doc;
     QString errorMsg;
     int errorLine, errorColumn;
-    if (!doc.setContent(xmlContent, &errorMsg, &errorLine, &errorColumn)) {
+    QDomDocument::ParseResult parseResult = doc.setContent(xmlContent, QDomDocument::ParseOption::UseNamespaceProcessing, &errorMsg, &errorLine, &errorColumn);
+    if (!parseResult) {
         result.errors << QString("XML parsing error at line %1, column %2: %3")
                                 .arg(errorLine).arg(errorColumn).arg(errorMsg);
         return result;
