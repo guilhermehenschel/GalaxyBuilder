@@ -58,8 +58,7 @@ ui_*.h
 
 # Visual Studio / VS Code
 .vs/
-.vscode/*
-.vscode/settings.json.user
+.vscode/settings.json
 .vscode/launch.json.user
 .vscode/tasks.json.user
 *.vcxproj.user
