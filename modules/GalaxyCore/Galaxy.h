@@ -2,7 +2,7 @@
 
 #include <QObject>
 #include <QQmlEngine>
-#include "Common.h"
+#include "ggh/modules/GalaxyCore/utilities/Common.h"
 #include "StarSystem.h"
 #include "TravelLane.h"
 #include "StarSystemListModel.h"
@@ -16,6 +16,11 @@
  * @class Galaxy
  * @brief Represents the galaxy containing star systems and travel lanes.
  */
+
+using SystemId = ggh::GalaxyCore::utilities::SystemId;
+using LaneId = ggh::GalaxyCore::utilities::LaneId;
+using GalaxySize = ggh::GalaxyCore::utilities::GalaxySize;
+using StarType = ggh::GalaxyCore::utilities::StarType;
 class GALAXYCORE_EXPORT Galaxy : public QObject {
     Q_OBJECT
     Q_PROPERTY(StarSystemListModel* systemsModel READ systemsModel WRITE setSystemsModel NOTIFY systemsModelChanged)

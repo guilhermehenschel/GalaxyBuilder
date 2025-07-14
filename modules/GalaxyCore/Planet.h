@@ -4,22 +4,13 @@
 #include <QString>
 #include <QQmlEngine>
 #include "galaxycore_global.h"
-
-enum class PlanetType {
-    Rocky,
-    GasGiant,
-    IceGiant,
-    Desert,
-    Ocean,
-    Frozen,
-    Volcanic,
-    Toxic
-};
+#include "ggh/modules/GalaxyCore/utilities/Common.h"
 
 /**
  * @class Planet
- * @brief Represents a planet with various properties such as size, mass, and temperature.
+ * @brief Represents a planet with various properties such as size, mass, and temperature. 
  */
+using PlanetType = ggh::GalaxyCore::utilities::PlanetType;
 class GALAXYCORE_EXPORT Planet : public QObject
 {
     Q_OBJECT
@@ -38,7 +29,6 @@ class GALAXYCORE_EXPORT Planet : public QObject
     Q_PROPERTY(double orbitalPeriod READ orbitalPeriod WRITE setOrbitalPeriod NOTIFY orbitalPeriodChanged)
 
 public:
-    Q_ENUM(PlanetType)
     explicit Planet(QObject *parent = nullptr);
     Planet(const QString &name, PlanetType type, QObject *parent = nullptr);
 
@@ -110,5 +100,3 @@ private:
     double m_orbitalRadius;     // Distance from star in AU
     double m_orbitalPeriod;     // Orbital period in Earth days
 };
-
-Q_DECLARE_METATYPE(PlanetType)

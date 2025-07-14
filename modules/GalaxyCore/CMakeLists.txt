@@ -3,9 +3,6 @@ cmake_minimum_required(VERSION 3.24)
 # GalaxyCore Module
 project(GalaxyCore VERSION 1.0.0 LANGUAGES CXX)
 
-# Find Qt6
-find_package(Qt6 REQUIRED COMPONENTS Core Qml Quick Xml)
-
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -19,6 +16,9 @@ set(CMAKE_AUTORCC ON)
 if(COMMAND qt_policy)
     qt_policy(SET QTP0001 NEW)
 endif()
+
+add_subdirectory(utilities)
+add_subdirectory(models)
 
 # Core library source files
 set(GALAXY_CORE_SOURCES
@@ -40,7 +40,6 @@ set(GALAXY_CORE_SOURCES
 
 # Core library header files
 set(GALAXY_CORE_HEADERS
-    Common.h
     StarSystem.h
     StarSystemQml.h
     Planet.h
@@ -82,6 +81,7 @@ set_target_properties(GalaxyCore PROPERTIES
 # Link Qt6 libraries
 target_link_libraries(GalaxyCore
     PUBLIC
+        GGH::GalaxyCore::Utilities
         Qt6::Core
         Qt6::Qml
         Qt6::Quick
@@ -91,10 +91,14 @@ target_link_libraries(GalaxyCore
 # Define library export symbol
 target_compile_definitions(GalaxyCore PRIVATE GALAXYCORE_LIBRARY)
 
+# Create an alias for the library
+add_library(GGH::GalaxyCore ALIAS GalaxyCore)
+
 # Include directories
 target_include_directories(GalaxyCore
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/utilities/include>
         $<INSTALL_INTERFACE:include/GalaxyCore>
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
@@ -117,6 +121,6 @@ install(FILES ${GALAXY_CORE_HEADERS}
 # Export configuration
 install(EXPORT GalaxyCoreTargets
     FILE GalaxyCoreTargets.cmake
-    NAMESPACE GalaxyCore::
+    NAMESPACE GGH::GalaxyCore::
     DESTINATION lib/cmake/GalaxyCore
 )

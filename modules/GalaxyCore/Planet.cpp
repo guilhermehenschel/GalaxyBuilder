@@ -1,6 +1,8 @@
 #include "Planet.h"
 #include <QColor>
 
+using PlanetType = ggh::GalaxyCore::utilities::PlanetType;
+
 Planet::Planet(QObject *parent)
     : QObject(parent)
     , m_name("Unnamed Planet")

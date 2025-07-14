@@ -1,58 +1,24 @@
+/**
+ * @file Common.h
+ * @brief Common types and constants for GalaxyCore module
+ */
+
 #pragma once
 
-#include <cstdint>
-#include <memory>
-#include <vector>
-#include <random>
-#include <QPointF>
-#include <QColor>
-#include <QString>
-#include <QMetaType>
+// Include the utilities Common.h and bring types into this namespace
+#include "utilities/include/ggh/modules/GalaxyCore/utilities/Common.h"
 
-// Type aliases for better readability
-using SystemId = std::uint32_t;
-using LaneId = std::uint32_t;
-using GalaxySize = std::uint32_t;
+// Bring the commonly used types from utilities namespace to GalaxyCore namespace
+using SystemId = ggh::GalaxyCore::utilities::SystemId;
+using LaneId = ggh::GalaxyCore::utilities::LaneId;
+using GalaxySize = ggh::GalaxyCore::utilities::GalaxySize;
+using StarType = ggh::GalaxyCore::utilities::StarType;
+using SystemSize = ggh::GalaxyCore::utilities::SystemSize;
+using GalaxyShape = ggh::GalaxyCore::utilities::GalaxyShape;
 
-// Constants
-constexpr double PI = 3.14159265358979323846;
-constexpr int DEFAULT_GALAXY_WIDTH = 1000;
-constexpr int DEFAULT_GALAXY_HEIGHT = 1000;
-constexpr int MIN_SYSTEM_DISTANCE = 50;
-constexpr int MAX_TRAVEL_LANE_DISTANCE = 150;
-
-// Enums
-enum class StarType {
-    RedDwarf,
-    YellowStar,
-    BlueStar,
-    WhiteDwarf,
-    RedGiant,
-    Neutron,
-    BlackHole
-};
-
-enum class SystemSize {
-    Small,
-    Medium,
-    Large,
-    Huge
-};
-
-enum class GalaxyShape {
-    Spiral,
-    Elliptical,
-    Ring,
-    Cluster
-};
-
-// Forward declarations
-class StarSystem;
-class TravelLane;
-class Galaxy;
-
-// Register enums with Qt's meta-type system
-Q_DECLARE_METATYPE(StarType)
-Q_DECLARE_METATYPE(SystemSize)
-Q_DECLARE_METATYPE(GalaxyShape)
-class Galaxy;
+// Bring constants into the global namespace for backward compatibility
+constexpr double PI = ggh::GalaxyCore::utilities::PI;
+constexpr int DEFAULT_GALAXY_WIDTH = ggh::GalaxyCore::utilities::DEFAULT_GALAXY_WIDTH;
+constexpr int DEFAULT_GALAXY_HEIGHT = ggh::GalaxyCore::utilities::DEFAULT_GALAXY_HEIGHT;
+constexpr int MIN_SYSTEM_DISTANCE = ggh::GalaxyCore::utilities::MIN_SYSTEM_DISTANCE;
+constexpr int MAX_TRAVEL_LANE_DISTANCE = ggh::GalaxyCore::utilities::MAX_TRAVEL_LANE_DISTANCE;

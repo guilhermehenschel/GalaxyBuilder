@@ -14,6 +14,8 @@
 #include <QJsonArray>
 #include <QPointF>
 
+using PlanetType = ggh::GalaxyCore::utilities::PlanetType;
+
 SystemDataManager::SystemDataManager(QObject* parent)
     : QObject(parent)
     , m_autoSaveEnabled(false)
