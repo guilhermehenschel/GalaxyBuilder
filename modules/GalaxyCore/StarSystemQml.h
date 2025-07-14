@@ -13,6 +13,7 @@
 
 class GALAXYCORE_EXPORT StarSystemQml : public QObject {
     Q_OBJECT
+    QML_NAMED_ELEMENT(StarSystem)
 
     Q_PROPERTY(int systemId READ getSystemId CONSTANT)
     Q_PROPERTY(QPointF position READ getPosition WRITE setPosition NOTIFY positionChanged)

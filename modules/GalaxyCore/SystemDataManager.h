@@ -11,6 +11,7 @@
 class GALAXYCORE_EXPORT SystemDataManager : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     explicit SystemDataManager(QObject* parent = nullptr);

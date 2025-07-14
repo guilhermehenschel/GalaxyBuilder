@@ -23,6 +23,7 @@ enum class PlanetType {
 class GALAXYCORE_EXPORT Planet : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
 
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(PlanetType type READ type WRITE setType NOTIFY typeChanged)
@@ -37,6 +38,7 @@ class GALAXYCORE_EXPORT Planet : public QObject
     Q_PROPERTY(double orbitalPeriod READ orbitalPeriod WRITE setOrbitalPeriod NOTIFY orbitalPeriodChanged)
 
 public:
+    Q_ENUM(PlanetType)
     explicit Planet(QObject *parent = nullptr);
     Planet(const QString &name, PlanetType type, QObject *parent = nullptr);
 

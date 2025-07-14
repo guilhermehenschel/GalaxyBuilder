@@ -15,6 +15,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
+# Set Qt policies
+if(COMMAND qt_policy)
+    qt_policy(SET QTP0001 NEW)
+endif()
+
 # Core library source files
 set(GALAXY_CORE_SOURCES
     StarSystem.cpp
@@ -53,9 +58,12 @@ set(GALAXY_CORE_HEADERS
 )
 
 # Create the core library
-qt_add_library(GalaxyCore SHARED
-    ${GALAXY_CORE_SOURCES}
-    ${GALAXY_CORE_HEADERS}
+qt_add_qml_module(GalaxyCore 
+    URI GalaxyCore
+    VERSION 1.0
+    SOURCES
+        ${GALAXY_CORE_SOURCES}
+        ${GALAXY_CORE_HEADERS}
 )
 
 # Set target properties
@@ -73,10 +81,11 @@ set_target_properties(GalaxyCore PROPERTIES
 
 # Link Qt6 libraries
 target_link_libraries(GalaxyCore
-    Qt6::Core
-    Qt6::Qml
-    Qt6::Quick
-    Qt6::Xml
+    PUBLIC
+        Qt6::Core
+        Qt6::Qml
+        Qt6::Quick
+        Qt6::Xml
 )
 
 # Define library export symbol

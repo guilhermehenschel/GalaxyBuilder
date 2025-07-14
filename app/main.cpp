@@ -47,19 +47,6 @@ int main(int argc, char *argv[])
     
     // Create QML engine
     QQmlApplicationEngine engine;
-    // Register QML types from GalaxyCore module
-    qmlRegisterType<GalaxyController>("GalaxyCore", 1, 0, "GalaxyController");
-    qmlRegisterType<Planet>("GalaxyCore", 1, 0, "Planet");
-    qmlRegisterType<StarSystemQml>("GalaxyCore", 1, 0, "StarSystem");
-    qmlRegisterType<SystemDataManager>("GalaxyCore", 1, 0, "SystemDataManager");
-    qmlRegisterType<StarSystemListModel>("GalaxyCore", 1, 0, "StarSystemListModel");
-    qmlRegisterType<TravelLaneListModel>("GalaxyCore", 1, 0, "TravelLaneListModel");
-    qmlRegisterType<SystemPropertiesViewModel>("GalaxyCore", 1, 0, "SystemPropertiesViewModel");
-    qmlRegisterType<ImportExportViewModel>("GalaxyCore", 1, 0, "ImportExportViewModel");
-    
-    std::cout << "Registered GalaxyController, Planet, StarSystem, SystemDataManager, StarSystemListModel, TravelLaneListModel, SystemPropertiesViewModel, and ImportExportViewModel QML types" << std::endl;
-    qDebug() << "Registered GalaxyController, Planet, StarSystem, SystemDataManager, StarSystemListModel, TravelLaneListModel, SystemPropertiesViewModel, and ImportExportViewModel QML types";
-    
     // Create and expose controller instance to QML
     GalaxyController controller;
     engine.rootContext()->setContextProperty("galaxyController", &controller);
