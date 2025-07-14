@@ -1010,5 +1010,7 @@ void TestPlanetPersistence::testMultipleSystemsPlanetPersistence()
     qDeleteAll(importedSystems);
 }
 
+#ifndef UNIFIED_TEST_RUNNER
 QTEST_MAIN(TestPlanetPersistence)
+#endif
 #include "test_planet_persistence.moc"

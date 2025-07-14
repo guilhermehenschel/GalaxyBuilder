@@ -1,4 +1,4 @@
-find_package(Qt6 6.9 REQUIRED COMPONENTS Core Quick Test Xml Qml QuickControls2)
+find_package(Qt6 6.9 REQUIRED COMPONENTS Core Quick Test Xml Qml QuickControls2 Widgets)
 
 # Enable Qt6 automatic tools
 set(CMAKE_AUTOMOC ON)

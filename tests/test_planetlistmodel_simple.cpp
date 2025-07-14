@@ -13,12 +13,13 @@
 
 /**
  * @brief Simple test to verify PlanetListModel functionality
+ * This function is called from the unified test runner
  */
-int main(int argc, char *argv[])
+int runPlanetListModelTests(int argc, char * const argv[])
 {
-    QCoreApplication app(argc, argv);
-    
     std::cout << "Testing PlanetListModel..." << std::endl;
+    
+    try {
     
     // Test 1: Model creation
     PlanetListModel model;
@@ -70,8 +71,23 @@ int main(int argc, char *argv[])
     assert(model.rowCount() == 0);
     std::cout << "✓ All planets cleared, row count is 0" << std::endl;
     
-    std::cout << "\nAll tests passed! ✅" << std::endl;
-    std::cout << "PlanetListModel is working correctly." << std::endl;
-    
-    return 0;
+        std::cout << "✅ All PlanetListModel tests passed!" << std::endl;
+        return 0;
+        
+    } catch (const std::exception& e) {
+        std::cerr << "❌ PlanetListModel test failed with exception: " << e.what() << std::endl;
+        return 1;
+    } catch (...) {
+        std::cerr << "❌ PlanetListModel test failed with unknown exception" << std::endl;
+        return 1;
+    }
 }
+
+// Keep the original main function for backward compatibility if run standalone
+#ifndef UNIFIED_TEST_RUNNER
+int main(int argc, char *argv[])
+{
+    QCoreApplication app(argc, argv);
+    return runPlanetListModelTests(argc, argv);
+}
+#endif
