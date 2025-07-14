@@ -67,8 +67,7 @@ StarSystemQml* SystemDataManager::importSystemFromXml(const QString& filePath)
     QDomDocument doc;
     QString errorMsg;
     int errorLine;
-    QDomDocument::ParseResult parseResult = doc.setContent(&file, QDomDocument::ParseOption::UseNamespaceProcessing, &errorMsg, &errorLine);
-    if (!parseResult) {
+    if (!doc.setContent(&file, &errorMsg, &errorLine)) {
         emit importError(QString("XML parsing error at line %1: %2").arg(errorLine).arg(errorMsg));
         file.close();
         return nullptr;
@@ -145,8 +144,7 @@ QList<StarSystemQml*> SystemDataManager::importGalaxyFromXml(const QString& file
     QDomDocument doc;
     QString errorMsg;
     int errorLine;
-    QDomDocument::ParseResult parseResult = doc.setContent(&file, QDomDocument::ParseOption::UseNamespaceProcessing, &errorMsg, &errorLine);
-    if (!parseResult) {
+    if (!doc.setContent(&file, &errorMsg, &errorLine)) {
         emit importError(QString("XML parsing error at line %1: %2").arg(errorLine).arg(errorMsg));
         file.close();
         return systems;
