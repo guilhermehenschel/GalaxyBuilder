@@ -19,6 +19,7 @@ endif()
 
 add_subdirectory(utilities)
 add_subdirectory(models)
+add_subdirectory(model_views)
 
 # Core library source files
 set(GALAXY_CORE_SOURCES
