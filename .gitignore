@@ -58,6 +58,7 @@ ui_*.h
 
 # Visual Studio / VS Code
 .vs/
+.vscode/
 .vscode/settings.json
 .vscode/launch.json.user
 .vscode/tasks.json.user
@@ -275,5 +276,6 @@ TODO.md
 NOTES.md
 scratch/
 experiments/
+.vscode/settings.json
 .vscode/settings.json
 .vscode/settings.json

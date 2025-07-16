@@ -18,19 +18,22 @@ include_directories(${CMAKE_SOURCE_DIR}/modules/GalaxyCore)
 
 # Create unified test executable for all GTest-based tests
 add_executable(GalaxyCoreViewModelsTests
-    test_GalaxyViewModel.cpp
-    test_PlanetViewModel.cpp
-    test_StarSystemViewModel.cpp
-    test_TravelLaneViewModel.cpp
+    test_planet_viewmodel.cpp
+    test_starsystem_viewmodel.cpp
+    test_galaxy_viewmodel.cpp
+    test_travellane_viewmodel.cpp
 )
 
 target_link_libraries(GalaxyCoreViewModelsTests PRIVATE
     gtest_main
     Qt6::Core
     Qt6::Qml
+    Qt6::Test
     Qt6::Xml
     Qt6::Widgets
+    GGH::GalaxyCore::ViewModels
     GGH::GalaxyCore::Models
+    GGH::GalaxyCore::Utilities
 )
 
 gtest_discover_tests(GalaxyCoreViewModelsTests)

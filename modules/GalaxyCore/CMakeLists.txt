@@ -19,7 +19,12 @@ endif()
 
 add_subdirectory(utilities)
 add_subdirectory(models)
-add_subdirectory(model_views)
+add_subdirectory(viewmodels)
+
+# Enable testing for this module
+if(BUILD_TESTING)
+    enable_testing()
+endif()
 
 # Core library source files
 set(GALAXY_CORE_SOURCES

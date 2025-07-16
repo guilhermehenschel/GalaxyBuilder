@@ -51,6 +51,7 @@ target_include_directories(GalaxyCoreViewModelsLib
 
 target_link_libraries(GalaxyCoreViewModels
     PUBLIC
+        GGH::GalaxyCore::Models
         GGH::GalaxyCore::Utilities
         Qt6::Core
         Qt6::Qml
