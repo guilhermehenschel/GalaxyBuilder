@@ -62,6 +62,7 @@ TEST_F(ExporterObjectTest, FilePathProperty) {
     EXPECT_EQ(exporterObject->getFilePath(), testPath);
     EXPECT_EQ(filePathChangedSpy.count(), 1);
     
+    filePathChangedSpy.clear();
     // Setting the same path should not emit signal
     exporterObject->setFilePath(testPath);
     EXPECT_EQ(filePathChangedSpy.count(), 1);

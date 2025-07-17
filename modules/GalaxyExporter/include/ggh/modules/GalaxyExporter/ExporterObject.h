@@ -79,8 +79,8 @@ signals:
     void errorStringChanged();
 
 private:
-    std::string m_filePath;  ///< The file path to export the galaxy data to
-    std::string m_errorString;///< The error string if the export fails
+    std::string m_filePath{""};  ///< The file path to export the galaxy data to
+    std::string m_errorString{""};///< The error string if the export fails
     std::unique_ptr<AbstractExporter> m_exporter; ///< The exporter instance used for exporting
 
     

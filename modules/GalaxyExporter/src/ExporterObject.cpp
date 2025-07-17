@@ -66,9 +66,9 @@ void ExporterObject::setModel(QObject* model) {
 
     if (model) {
         ModelVariant variantModel;
-        if (auto galaxyModel = qobject_cast<ggh::GalaxyCore::viewmodels::GalaxyViewModel*>(model)) {
+        if (auto galaxyModel = dynamic_cast<ggh::GalaxyCore::viewmodels::GalaxyViewModel*>(model)) {
             variantModel = galaxyModel;
-        } else if (auto starSystemModel = qobject_cast<ggh::GalaxyCore::viewmodels::StarSystemViewModel*>(model)) {
+        } else if (auto starSystemModel = dynamic_cast<ggh::GalaxyCore::viewmodels::StarSystemViewModel*>(model)) {
             variantModel = starSystemModel;
         } else {
             setErrorString("Model type not supported for export.");
