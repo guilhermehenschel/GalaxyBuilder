@@ -109,6 +109,14 @@ public:
      */
     std::string toXml() const;
 
+    /**
+     * @brief Gets the XML tag name for the galaxy model.
+     * @return A string containing the XML tag name.
+     */
+    static std::string xmlTag() noexcept {
+        return "Galaxy";
+    }
+
  private:
     int m_width;  ///< Width of the galaxy
     int m_height; ///< Height of the galaxy

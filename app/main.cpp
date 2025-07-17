@@ -14,17 +14,6 @@
 // #include <windows.h>
 #endif
 
-// Include the GalaxyCore module
-#include "GalaxyController.h"
-#include "Planet.h"
-#include "StarSystemQml.h"
-#include "SystemDataManager.h"
-#include "StarSystemListModel.h"
-#include "TravelLaneListModel.h"
-#include "SystemPropertiesViewModel.h"
-#include "ImportExportViewModel.h"
-#include "Common.h"
-
 int main(int argc, char *argv[])
 {
 
@@ -47,9 +36,6 @@ int main(int argc, char *argv[])
     
     // Create QML engine
     QQmlApplicationEngine engine;
-    // Create and expose controller instance to QML
-    GalaxyController controller;
-    engine.rootContext()->setContextProperty("galaxyController", &controller);
     std::cout << "Set galaxyController context property" << std::endl;
     qDebug() << "Set galaxyController context property";
     

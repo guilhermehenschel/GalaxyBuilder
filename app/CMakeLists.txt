@@ -56,7 +56,6 @@ target_link_libraries(GalaxyBuilderApp PRIVATE
     Qt6::Qml
     Qt6::Quick
     Qt6::QuickControls2
-    GalaxyCore
 )
 
 # Set target properties

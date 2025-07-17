@@ -37,6 +37,14 @@ public:
     void addPlanet(const Planet& planet);
     bool removePlanet(const Planet& planet);
 
+        /**
+     * @brief Gets the XML tag name for the model.
+     * @return A string containing the XML tag name.
+     */
+    static std::string xmlTag() noexcept {
+        return "StarSystem";
+    }
+
 private:
     SystemId m_id;  // Unique identifier for the star system
     utilities::CartesianCoordinates<double> m_position;  // Position of the star system in Cartesian coordinates

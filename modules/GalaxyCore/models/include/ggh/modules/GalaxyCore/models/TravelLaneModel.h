@@ -66,6 +66,14 @@ public:
      */
     std::string toXml() const;
 
+    /**
+     * @brief Gets the XML tag name for the model.
+     * @return A string containing the XML tag name.
+     */
+    static std::string xmlTag() noexcept {
+        return "TravelLane";
+    }
+
 private:
     utilities::LaneId m_id; ///< Lane identifier
     std::shared_ptr<StarSystemModel> m_fromSystem; ///< System identifier of the starting system

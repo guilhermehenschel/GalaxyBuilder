@@ -37,7 +37,15 @@ public:
     // Serialization methods
     std::string toXml() const;
 
-    private:
+        /**
+     * @brief Gets the XML tag name for the model.
+     * @return A string containing the XML tag name.
+     */
+    static std::string xmlTag() noexcept {
+        return "Planet";
+    }
+
+private:
     std::string m_name;
     PlanetType m_type;
     double m_size;

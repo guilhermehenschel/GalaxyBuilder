@@ -78,7 +78,7 @@ install(FILES ${HEADER_FILES}
     DESTINATION include/GalaxyCore/models
 )
 
-install(TARGETS ${PROJECT_NAME}
+install(TARGETS ${PROJECT_NAME} GalaxyCoreModelsLib
     EXPORT GalaxyCoreTargets
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib

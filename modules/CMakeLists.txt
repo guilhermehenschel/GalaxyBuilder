@@ -1,0 +1,2 @@
+add_subdirectory(GalaxyCore)
+add_subdirectory(GalaxyFactories)

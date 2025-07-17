@@ -68,7 +68,7 @@ target_link_libraries(GalaxyCoreViewModelsLib
 # Compiler definitions for shared library export
 target_compile_definitions(${PROJECT_NAME} PRIVATE GALAXYCORE_LIBRARY)
 
-if(BUILD_TESTING)
+if(${BUILD_TESTING})
     enable_testing()
     add_subdirectory(tests)
 endif()
@@ -80,7 +80,7 @@ install(FILES ${HEADER_FILES}
     DESTINATION include/GalaxyCore/models
 )
 
-install(TARGETS ${PROJECT_NAME}
+install(TARGETS ${PROJECT_NAME} GalaxyCoreViewModelsLib
     EXPORT GalaxyCoreTargets
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib

@@ -24,13 +24,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Build the core module first
-add_subdirectory(modules/GalaxyCore)
-
-# Build tests if enabled
-if(BUILD_TESTING)
-    enable_testing()
-    add_subdirectory(tests)
-endif()
+add_subdirectory(modules)
 
 # Build the application if enabled
 if(BUILD_QT_APP)
