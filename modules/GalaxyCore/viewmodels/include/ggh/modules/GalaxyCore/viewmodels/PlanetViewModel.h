@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QtQml>
 #include <memory>
 #include "ggh/modules/GalaxyCore/models/PlanetModel.h"
 #include "ggh/modules/GalaxyCore/utilities/Common.h"
@@ -17,6 +18,7 @@ using PlanetType = ggh::GalaxyCore::utilities::PlanetType;
  */
 class PlanetViewModel : public QObject {
     Q_OBJECT
+    QML_ELEMENT
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(int planetType READ planetType WRITE setPlanetType NOTIFY planetTypeChanged)
     Q_PROPERTY(double size READ size WRITE setSize NOTIFY sizeChanged)

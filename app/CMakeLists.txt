@@ -23,6 +23,7 @@ set(CMAKE_AUTOUIC ON)
 # Application source files
 set(APP_SOURCES
     main.cpp
+    GalaxyController.cpp
 )
 
 # Create the executable
@@ -56,6 +57,10 @@ target_link_libraries(GalaxyBuilderApp PRIVATE
     Qt6::Qml
     Qt6::Quick
     Qt6::QuickControls2
+    GGH::GalaxyCore::ViewModels
+    GGH::GalaxyCore::Models
+    GGH::GalaxyExporter
+    GGH::GalaxyFactories
 )
 
 # Set target properties

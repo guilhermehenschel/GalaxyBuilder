@@ -2,7 +2,9 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import Qt.labs.platform 1.1 as Platform
-import GalaxyCore 1.0
+import GalaxyBuilderApp 1.0
+import GalaxyCore.ViewModels 1.0
+import Galaxy.Exporters 1.0
 
 ApplicationWindow {
     id: window
@@ -16,19 +18,17 @@ ApplicationWindow {
     
     color: "#1a1a1a"
     
-    // MVVM ViewModel
-    ImportExportViewModel {
-        id: viewModel
+    // MVVM ViewModel - ExporterObject is a singleton
+    property ExporterObject viewModel: ExporterObject
         
-        Component.onCompleted: {
-            // Set data manager from global context
-            if (galaxyController && galaxyController.systemDataManager) {
-                setDataManager(galaxyController.systemDataManager)
-            }
-            // Initialize available systems
-            if (galaxyController && galaxyController.systemsModel) {
-                setSystemsModel(galaxyController.systemsModel)
-            }
+    Component.onCompleted: {
+        // Set data manager from global context
+        if (galaxyController && galaxyController.systemDataManager) {
+            setDataManager(galaxyController.systemDataManager)
+        }
+        // Initialize available systems
+        if (galaxyController && galaxyController.systemsModel) {
+            setSystemsModel(galaxyController.systemsModel)
         }
     }
     

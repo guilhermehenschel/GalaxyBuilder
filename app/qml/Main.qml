@@ -2,7 +2,11 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Dialogs
-import GalaxyCore 1.0
+import GalaxyBuilderApp 1.0
+import GalaxyCore.ViewModels 1.0
+import GalaxyCore.Model 1.0
+import Galaxy.Factories 1.0
+import Galaxy.Exporters 1.0
 import "components"
 
 ApplicationWindow {
@@ -17,12 +21,10 @@ ApplicationWindow {
     
     color: "#1e1e1e"
     
-    // Note: GalaxyController instance is provided by main.cpp as galaxyController context property
-    
     // Galaxy manager handles model creation and injection
     GalaxyManager {
         id: galaxyManager
-        controller: galaxyController
+        controller: GalaxyController
     }
     
     // Main layout
@@ -36,7 +38,7 @@ ApplicationWindow {
             Layout.preferredWidth: 300
             Layout.minimumWidth: 250
             Layout.fillHeight: true
-            controller: galaxyController
+            controller: GalaxyController
         }
         
         // Splitter
@@ -51,7 +53,7 @@ ApplicationWindow {
             id: galaxyView
             Layout.fillWidth: true
             Layout.fillHeight: true
-            controller: galaxyController
+            controller: GalaxyController
             
             onSystemDoubleClicked: function(systemId) {
                 showSystemPropertiesDialog(systemId)
@@ -59,28 +61,30 @@ ApplicationWindow {
         }
     }
     
-    // System Properties Dialog
+    // System Properties Window
     SystemPropertiesDialog {
-        id: systemPropertiesDialog
+        id: systemPropertiesWindow
         visible: false
     }
     
     // Function to show system properties dialog
     function showSystemPropertiesDialog(systemId) {
-        if (galaxyController) {
+        console.log("System properties requested for system ID:", systemId)
+        if (GalaxyController) {
             console.log("Opening system properties for system ID:", systemId)
             
             // Select the system first to ensure controller has the right selection
-            galaxyController.selectSystem(systemId)
+            GalaxyController.selectSystem(systemId)
             
-            // Get the selected star system from the controller
-            var starSystem = galaxyController.selectedStarSystem
-            if (starSystem) {
-                console.log("Updating dialog with StarSystem:", starSystem.name)
-                systemPropertiesDialog.starSystem = starSystem
-                systemPropertiesDialog.show()
+            // Use the selected system from the controller
+            if (GalaxyController.hasSelectedSystem && GalaxyController.selectedStarSystemViewModel) {
+                console.log("Updating window with StarSystemViewModel:", GalaxyController.selectedStarSystemViewModel.name)
+                systemPropertiesWindow.starSystemViewModel = GalaxyController.selectedStarSystemViewModel
+                systemPropertiesWindow.show()
+                systemPropertiesWindow.raise()
+                systemPropertiesWindow.requestActivate()
             } else {
-                console.error("Failed to get StarSystem from controller for ID:", systemId)
+                console.error("Failed to get StarSystemViewModel from controller for ID:", systemId)
             }
         } else {
             console.error("Controller not available")
@@ -103,16 +107,42 @@ ApplicationWindow {
             anchors.margins: 8
             
             Text {
-                text: galaxyController ? galaxyController.statusMessage : "Loading..."
+                text: GalaxyController ? GalaxyController.statusMessage : "Loading..."
                 color: "#ffffff"
                 font.pixelSize: 12
                 Layout.fillWidth: true
             }
             
+            // App confirmation button
+            Button {
+                id: confirmationButton
+                text: "✓ App Running OK"
+                onClicked: {
+                    console.log("User confirmed: Galaxy Builder application is running successfully!")
+                    confirmationButton.text = "✓ Confirmed!"
+                    confirmationButton.enabled = false
+                }
+                
+                background: Rectangle {
+                    color: confirmationButton.enabled ? "#2d7d32" : "#424242"
+                    border.color: "#4caf50"
+                    border.width: 1
+                    radius: 3
+                }
+                
+                contentItem: Text {
+                    text: confirmationButton.text
+                    color: "#ffffff"
+                    font.pixelSize: 11
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+            }
+            
             // Generation progress indicator
             BusyIndicator {
-                visible: galaxyController ? galaxyController.isGenerating : false
-                running: galaxyController ? galaxyController.isGenerating : false
+                visible: GalaxyController ? GalaxyController.isGenerating : false
+                running: GalaxyController ? GalaxyController.isGenerating : false
                 implicitWidth: 16
                 implicitHeight: 16
             }
@@ -125,11 +155,11 @@ ApplicationWindow {
             title: "&File"
             MenuItem {
                 text: "&Generate New Galaxy"
-                onTriggered: galaxyController.generateGalaxy()
+                onTriggered: GalaxyController.generateGalaxy()
             }
             MenuItem {
                 text: "Generate &Random Galaxy"
-                onTriggered: galaxyController.generateRandomGalaxy()
+                onTriggered: GalaxyController.generateRandomGalaxy()
             }
             MenuSeparator {}
             MenuItem {
@@ -138,7 +168,7 @@ ApplicationWindow {
             }
             MenuItem {
                 text: "&Export Image..."
-                onTriggered: exportDialog.open()
+                onTriggered: exportImageDialog.open()
             }
             MenuSeparator {}
             MenuItem {
@@ -152,20 +182,20 @@ ApplicationWindow {
             MenuItem {
                 text: "Show System &Names"
                 checkable: true
-                checked: galaxyController ? galaxyController.showSystemNames : false
-                onTriggered: if (galaxyController) galaxyController.showSystemNames = checked
+                checked: GalaxyController ? GalaxyController.showSystemNames : false
+                onTriggered: if (GalaxyController) GalaxyController.showSystemNames = checked
             }
             MenuItem {
                 text: "Show &Travel Lanes"
                 checkable: true
-                checked: galaxyController ? galaxyController.showTravelLanes : false
-                onTriggered: if (galaxyController) galaxyController.showTravelLanes = checked
+                checked: GalaxyController ? GalaxyController.showTravelLanes : false
+                onTriggered: if (GalaxyController) GalaxyController.showTravelLanes = checked
             }
             MenuItem {
                 text: "Show &Influence Radius"
                 checkable: true
-                checked: galaxyController ? galaxyController.showInfluenceRadius : false
-                onTriggered: if (galaxyController) galaxyController.showInfluenceRadius = checked
+                checked: GalaxyController ? GalaxyController.showInfluenceRadius : false
+                onTriggered: if (GalaxyController) GalaxyController.showInfluenceRadius = checked
             }
         }
         
@@ -195,7 +225,7 @@ ApplicationWindow {
         defaultSuffix: "png"
         onAccepted: {
             var size = Qt.size(1920, 1080) // Default export size
-            galaxyController.exportGalaxyImage(selectedFile, size)
+            GalaxyController.exportGalaxyImage(selectedFile, size)
         }
     }
     

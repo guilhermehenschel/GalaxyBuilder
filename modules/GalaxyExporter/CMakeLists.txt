@@ -41,12 +41,12 @@ set(GALAXY_FACTORIES_SOURCES
 
 # Create the core library
 qt_add_qml_module(GalaxyExporter 
-    URI Galaxy.Exporter
+    URI Galaxy.Exporters
     VERSION 1.0
     SOURCES
         ${GALAXY_FACTORIES_SOURCES}
         ${GALAXY_FACTORIES_HEADERS}
-    OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/qml/Galaxy/Exporter
+    OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/qml/Galaxy/Exporters
 )
 
 # Set target properties

@@ -17,7 +17,9 @@ set(HEADER_FILES
     include/ggh/modules/GalaxyCore/viewmodels/PlanetViewModel.h
     include/ggh/modules/GalaxyCore/viewmodels/StarSystemListModel.h
     include/ggh/modules/GalaxyCore/viewmodels/StarSystemViewModel.h
+    include/ggh/modules/GalaxyCore/viewmodels/TravelLaneListModel.h
     include/ggh/modules/GalaxyCore/viewmodels/TravelLaneViewModel.h
+    include/ggh/modules/GalaxyCore/viewmodels/Commons.h
 )
 
 set(SRC_FILES
@@ -26,13 +28,14 @@ set(SRC_FILES
     src/PlanetViewModel.cpp
     src/StarSystemListModel.cpp
     src/StarSystemViewModel.cpp
+    src/TravelLaneListModel.cpp
     src/TravelLaneViewModel.cpp
 )
 
 qt_add_qml_module(GalaxyCoreViewModels
-    URI GalaxyCore.ViewModel
+    URI GalaxyCore.ViewModels
     VERSION 1.0
-    OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/qml/GalaxyCore/ViewModel
+    OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/qml/GalaxyCore/ViewModels
     SOURCES
         ${HEADER_FILES}
         ${SRC_FILES}
@@ -64,6 +67,7 @@ target_link_libraries(GalaxyCoreViewModels
         GGH::GalaxyCore::Models
         GGH::GalaxyCore::Utilities
         Qt6::Core
+        Qt6::Gui
         Qt6::Quick
         Qt6::Qml
 )
@@ -72,6 +76,7 @@ target_link_libraries(GalaxyCoreViewModelsLib
     PUBLIC
         GGH::GalaxyCore::Models
         GGH::GalaxyCore::Utilities
+        Qt6::Gui
         Qt6::Core
         Qt6::Qml
 )

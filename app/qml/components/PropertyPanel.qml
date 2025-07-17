@@ -1,13 +1,13 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import GalaxyCore 1.0
+import GalaxyBuilderApp 1.0
 
 Rectangle {
     id: root
     
     // Properties that will be bound from the parent
     property GalaxyController controller
-    property bool hasSelectedSystem: controller && controller.hasSelectedSystem
+    property bool hasSelectedSystem: controller && controller.selectedStarSystemViewModel
     
     // Panel appearance
     color: "#252525"
@@ -67,13 +67,11 @@ Rectangle {
                         selectByMouse: true
                         
                         property bool internalUpdate: false
-                        text: controller && !activeFocus && !internalUpdate ? controller.selectedSystemName : text
+                        text: hasSelectedSystem && controller.selectedStarSystemViewModel ? controller.selectedStarSystemViewModel.name : "No system selected"
                         
                         onTextChanged: {
-                            if (controller && activeFocus && !internalUpdate) {
-                                internalUpdate = true
-                                controller.selectedSystemName = text
-                                internalUpdate = false
+                            if (!internalUpdate && hasSelectedSystem && controller.selectedStarSystemViewModel) {
+                                controller.selectedStarSystemViewModel.name = text
                             }
                         }
                         
@@ -91,12 +89,13 @@ Rectangle {
                 
                 content: ClickableProperty {
                     width: parent.width
-                    text: getStarTypeName(controller ? controller.selectedSystemType : 0)
+                    text: hasSelectedSystem && controller.selectedStarSystemViewModel ? getStarTypeName(controller.selectedStarSystemViewModel.starType) : "No system selected"
                     onClicked: {
-                        if (controller) {
-                            var currentType = controller.selectedSystemType
-                            var nextType = (currentType + 1) % 7  // 7 star types (0-6)
-                            controller.selectedSystemType = nextType
+                        if (hasSelectedSystem && controller.selectedStarSystemViewModel) {
+                            // Cycle through star types
+                            var currentType = controller.selectedStarSystemViewModel.starType
+                            var newType = (currentType + 1) % 8 // Assuming 8 star types
+                            controller.selectedStarSystemViewModel.starType = newType
                         }
                     }
                 }
@@ -109,12 +108,13 @@ Rectangle {
                 
                 content: ClickableProperty {
                     width: parent.width
-                    text: getSystemSizeName(controller ? controller.selectedSystemSize : 0)
+                    text: hasSelectedSystem && controller.selectedStarSystemViewModel ? getSystemSizeName(controller.selectedStarSystemViewModel.systemSize) : "No system selected"
                     onClicked: {
-                        if (controller) {
-                            var currentSize = controller.selectedSystemSize
-                            var nextSize = (currentSize + 1) % 5  // 5 system sizes (0-4)
-                            controller.selectedSystemSize = nextSize
+                        if (hasSelectedSystem && controller.selectedStarSystemViewModel) {
+                            // Cycle through system sizes
+                            var currentSize = controller.selectedStarSystemViewModel.systemSize
+                            var newSize = (currentSize + 1) % 5 // Assuming 5 system sizes
+                            controller.selectedStarSystemViewModel.systemSize = newSize
                         }
                     }
                 }
@@ -157,13 +157,31 @@ Rectangle {
                                 validator: DoubleValidator { bottom: 0; top: 9999; decimals: 1 }
                                 
                                 property bool internalUpdate: false
-                                text: controller && !activeFocus && !internalUpdate ? controller.selectedSystemX.toFixed(1) : text
+                                
+                                Component.onCompleted: {
+                                    updateText()
+                                }
+                                
+                                function updateText() {
+                                    internalUpdate = true
+                                    text = hasSelectedSystem && controller.selectedStarSystemViewModel ? controller.selectedStarSystemViewModel.positionX.toFixed(1) : "0.0"
+                                    internalUpdate = false
+                                }
+                                
+                                // Watch for changes to the model property
+                                Connections {
+                                    target: hasSelectedSystem && controller.selectedStarSystemViewModel ? controller.selectedStarSystemViewModel : null
+                                    function onPositionChanged() {
+                                        systemXInput.updateText()
+                                    }
+                                }
                                 
                                 onTextChanged: {
-                                    if (controller && activeFocus && !internalUpdate && !isNaN(parseFloat(text))) {
-                                        internalUpdate = true
-                                        controller.selectedSystemX = parseFloat(text)
-                                        internalUpdate = false
+                                    if (!internalUpdate && hasSelectedSystem && controller.selectedStarSystemViewModel) {
+                                        var newValue = parseFloat(text)
+                                        if (!isNaN(newValue)) {
+                                            controller.selectedStarSystemViewModel.positionX = newValue
+                                        }
                                     }
                                 }
                                 
@@ -201,13 +219,31 @@ Rectangle {
                                 validator: DoubleValidator { bottom: 0; top: 9999; decimals: 1 }
                                 
                                 property bool internalUpdate: false
-                                text: controller && !activeFocus && !internalUpdate ? controller.selectedSystemY.toFixed(1) : text
+                                
+                                Component.onCompleted: {
+                                    updateText()
+                                }
+                                
+                                function updateText() {
+                                    internalUpdate = true
+                                    text = hasSelectedSystem && controller.selectedStarSystemViewModel ? controller.selectedStarSystemViewModel.positionY.toFixed(1) : "0.0"
+                                    internalUpdate = false
+                                }
+                                
+                                // Watch for changes to the model property
+                                Connections {
+                                    target: hasSelectedSystem && controller.selectedStarSystemViewModel ? controller.selectedStarSystemViewModel : null
+                                    function onPositionChanged() {
+                                        systemYInput.updateText()
+                                    }
+                                }
                                 
                                 onTextChanged: {
-                                    if (controller && activeFocus && !internalUpdate && !isNaN(parseFloat(text))) {
-                                        internalUpdate = true
-                                        controller.selectedSystemY = parseFloat(text)
-                                        internalUpdate = false
+                                    if (!internalUpdate && hasSelectedSystem && controller.selectedStarSystemViewModel) {
+                                        var newValue = parseFloat(text)
+                                        if (!isNaN(newValue)) {
+                                            controller.selectedStarSystemViewModel.positionY = newValue
+                                        }
                                     }
                                 }
                                 

@@ -11,6 +11,7 @@
 #include "ggh/modules/GalaxyCore/models/GalaxyModel.h"
 #include "ggh/modules/GalaxyCore/models/StarSystemModel.h"
 #include "ggh/modules/GalaxyCore/viewmodels/StarSystemListModel.h"
+#include "ggh/modules/GalaxyCore/viewmodels/TravelLaneListModel.h"
 namespace ggh::GalaxyCore::viewmodels {
 
 class GalaxyViewModel : public QObject
@@ -20,7 +21,9 @@ class GalaxyViewModel : public QObject
     Q_PROPERTY(qint32 width READ width WRITE setWidth NOTIFY dimensionsChanged)
     Q_PROPERTY(qint32 height READ height WRITE setHeight NOTIFY dimensionsChanged)
     Q_PROPERTY(quint32 systemCount READ systemCount NOTIFY systemCountChanged)
+    Q_PROPERTY(quint32 travelLaneCount READ travelLaneCount NOTIFY travelLaneCountChanged)
     Q_PROPERTY(ggh::GalaxyCore::viewmodels::StarSystemListModel* starSystems READ starSystems CONSTANT)
+    Q_PROPERTY(ggh::GalaxyCore::viewmodels::TravelLaneListModel* travelLanes READ travelLanes CONSTANT)
 
     QML_ELEMENT
 
@@ -32,7 +35,9 @@ public:
     qint32 width() const;
     qint32 height() const;
     quint32 systemCount() const;
+    quint32 travelLaneCount() const;
     StarSystemListModel* starSystems();
+    TravelLaneListModel* travelLanes();
 
     // Property setters
     void setWidth(qint32 width);
@@ -52,12 +57,15 @@ public:
 signals:
     void dimensionsChanged();
     void systemCountChanged();
+    void travelLaneCountChanged();
 
 private:
     void initializeStarSystemsModel();
+    void initializeTravelLanesModel();
 
     std::shared_ptr<models::GalaxyModel> m_galaxy;
     std::unique_ptr<StarSystemListModel> m_starSystemsModel;
+    std::unique_ptr<TravelLaneListModel> m_travelLanesModel;
 };
 } // namespace ggh::GalaxyCore::viewmodels
 

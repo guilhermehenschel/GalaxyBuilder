@@ -1,7 +1,8 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
-import GalaxyCore 1.0
+import GalaxyBuilderApp 1.0
+import Galaxy.Factories 1.0
 
 ScrollView {
     id: root
@@ -119,9 +120,9 @@ ScrollView {
                 SpinBox {
                     from: 0
                     to: 999999
-                    value: controller ? controller.seed : 0
+                    value: 0 // TODO: Add seed property to GalaxyController
                     editable: true
-                    onValueChanged: if (controller) controller.seed = value
+                    onValueChanged: if (controller) controller.setGenerationSeed(value)
                     Layout.fillWidth: true
                 }
             }

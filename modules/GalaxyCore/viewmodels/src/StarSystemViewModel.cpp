@@ -1,5 +1,6 @@
 #include "ggh/modules/GalaxyCore/viewmodels/StarSystemViewModel.h"
 #include "ggh/modules/GalaxyCore/models/PlanetModel.h"
+#include "ggh/modules/GalaxyCore/viewmodels/Commons.h"
 
 namespace ggh::GalaxyCore::viewmodels {
 
@@ -50,6 +51,11 @@ int StarSystemViewModel::starType() const
 int StarSystemViewModel::systemSize() const
 {
     return static_cast<int>(m_starSystem->getSystemSize());
+}
+
+QColor StarSystemViewModel::color() const
+{
+    return commons::starColor(m_starSystem->getStarType());
 }
 
 QAbstractListModel* StarSystemViewModel::planets()

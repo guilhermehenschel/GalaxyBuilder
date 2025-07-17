@@ -1,10 +1,11 @@
 import QtQuick 2.15
 import QtQuick.Controls
 import QtQuick.Layouts
-import GalaxyCore 1.0
+import GalaxyBuilderApp 1.0
+import GalaxyCore.ViewModels 1.0
 
 Rectangle {
-    required property Planet planet
+    required property PlanetViewModel planet
     required property int index
     property bool isCurrentItem: false
 

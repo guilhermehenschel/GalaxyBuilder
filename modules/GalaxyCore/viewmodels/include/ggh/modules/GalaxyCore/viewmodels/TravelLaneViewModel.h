@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QtQml>
 #include <memory>
 
 #include "ggh/modules/GalaxyCore/models/TravelLaneModel.h"
@@ -12,6 +13,7 @@ namespace ggh::GalaxyCore::viewmodels {
 class TravelLaneViewModel : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
 
     Q_PROPERTY(quint32 fromSystemId READ fromSystemId WRITE setFromSystemId NOTIFY fromSystemIdChanged)
     Q_PROPERTY(quint32 toSystemId READ toSystemId WRITE setToSystemId NOTIFY toSystemIdChanged)

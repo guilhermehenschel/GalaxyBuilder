@@ -1,8 +1,9 @@
 import QtQuick
 import QtQuick.Controls
 import QtQml
-import GalaxyCore 1.0
 import GalaxyBuilderApp 1.0
+import GalaxyCore.ViewModels 1.0
+import GalaxyCore.Model 1.0
 
 Item {
     id: root
@@ -40,14 +41,14 @@ Item {
                 text: "No galaxy generated. Click 'Generate Galaxy' to start."
                 color: "#404040"
                 font.pixelSize: 16
-                visible: !controller || !controller.galaxy
+                visible: !controller || !controller.galaxyViewModel
             }
             
             // Container for galaxy content with zoom/pan transform
             Item {
                 id: galaxyContainer
                 anchors.fill: parent
-                visible: controller && controller.galaxy
+                visible: controller && controller.galaxyViewModel
                 
                 transform: [
                     Translate {
@@ -64,32 +65,32 @@ Item {
                     }
                 ]
                 
-                // Travel lanes (drawn first, behind systems)
+                // Travel lanes - using actual C++ created travel lane data
                 Repeater {
-                    model: controller && controller.galaxy ? controller.galaxy.lanesModel : null
+                    id: travelLanesRepeater
+                    model: controller && controller.galaxyViewModel && controller.showTravelLanes ? controller.galaxyViewModel.travelLanes : null
+                    
                     delegate: TravelLane {
-                        startX: model.startX
-                        startY: model.startY
-                        endX: model.endX
-                        endY: model.endY
-                        visible: controller ? controller.showTravelLanes : false
-                        laneColor: "#00ffff"
-                        laneOpacity: 0.6
-                        laneWidth: 1
+                        startX: model.fromX
+                        startY: model.fromY
+                        endX: model.toX
+                        endY: model.toY
+                        laneOpacity: model.isActive ? 0.6 : 0.3
+                        laneColor: model.laneType === 0 ? "#00ffff" : "#ffff00"  // Different colors for different lane types
                     }
                 }
                 
                 // Star systems
                 Repeater {
-                    model: controller && controller.galaxy ? controller.galaxy.systemsModel : null
+                    model: controller && controller.galaxyViewModel ? controller.galaxyViewModel.starSystems : null
                     delegate: SystemNode {
-                        systemId: model.id
+                        systemId: model.systemId
                         systemName: model.name
-                        systemX: model.x
-                        systemY: model.y
-                        systemType: model.type
-                        systemSize: model.size
-                        isSelected: controller && controller.hasSelectedSystem && model && (model.id === controller.selectedSystemId)
+                        systemX: model.positionX
+                        systemY: model.positionY
+                        systemType: model.starType
+                        systemSize: model.systemSize
+                        isSelected: controller && controller.selectedStarSystemViewModel ? (controller.selectedStarSystemViewModel.systemId === model.systemId) : false
                         showInfluenceRadius: controller ? controller.showInfluenceRadius : false
                         showSystemNames: controller ? controller.showSystemNames : true
                         controller: root.controller
@@ -178,7 +179,7 @@ Item {
             panOffset: root.panOffset
         }
         
-        // System Properties Panel
+        // System Properties Panel (enabled for testing)
         PropertyPanel {
             anchors.right: parent.right
             anchors.bottom: parent.bottom
@@ -187,7 +188,7 @@ Item {
             anchors.rightMargin: 10
             anchors.bottomMargin: 10
             width: 300
-            visible: controller && controller.hasSelectedSystem
+            visible: true // Enabled to show the panel
             
             controller: root.controller
         }

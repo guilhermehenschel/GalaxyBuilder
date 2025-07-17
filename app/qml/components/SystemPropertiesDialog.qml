@@ -1,494 +1,452 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import QtQuick.Dialogs
-import Qt.labs.platform 1.1 as Platform
-import GalaxyCore 1.0
+import QtQuick.Window
+import GalaxyBuilderApp 1.0
+import GalaxyCore.ViewModels 1.0
+import GalaxyCore.Model 1.0
 
 ApplicationWindow {
     id: window
     
-    property StarSystem starSystem: null
+    property var starSystemViewModel: null
     
-    title: viewModel.starSystem ? "System Properties - " + viewModel.starSystem.name : "System Properties"
+    title: starSystemViewModel ? "System Properties - " + starSystemViewModel.name : "System Properties"
     width: 800
     height: 600
-    minimumWidth: 600
-    minimumHeight: 400
     modality: Qt.ApplicationModal
+    flags: Qt.Dialog
     
+    // Background
     color: "#1a1a1a"
-    
-    // MVVM ViewModel
-    SystemPropertiesViewModel {
-        id: viewModel
-        starSystem: window.starSystem
-        isAutoSaveEnabled: true
-        
-        Component.onCompleted: {
-            // Set data manager from global context
-            console.log("ViewModel Component.onCompleted - galaxyController:", galaxyController)
-            if (galaxyController && galaxyController.systemDataManager) {
-                console.log("Setting data manager:", galaxyController.systemDataManager)
-                setDataManager(galaxyController.systemDataManager)
-                console.log("Data manager set, hasDataManager:", hasDataManager())
-            } else {
-                console.log("Error: galaxyController or systemDataManager not available")
-            }
-        }
-    }
-    
-    // Save data when dialog is closing
-    onClosing: {
-        viewModel.saveSystemData()
-    }
-    
-    ScrollView {
+
+    ColumnLayout {
         anchors.fill: parent
         anchors.margins: 10
+        spacing: 10
         
-        ColumnLayout {
-            width: window.width - 20
-            spacing: 15
+        ScrollView {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
             
-            // Star Properties Section
-            GroupBox {
-                Layout.fillWidth: true
-                title: "Star Properties"
-                
-                background: Rectangle {
-                    color: "#2a2a2a"
-                    border.color: "#404040"
-                    radius: 5
-                }
-                
-                label: Text {
-                    color: "#ffffff"
-                    text: parent.title
-                    font.bold: true
-                }
-                
-                GridLayout {
-                    anchors.fill: parent
-                    columns: 2
-                    columnSpacing: 10
-                    rowSpacing: 10
+            ColumnLayout {
+                width: window.width - 40
+                spacing: 15
+            
+                // Star Properties Section
+                GroupBox {
+                    Layout.fillWidth: true
+                    title: "Star Properties"
                     
-                    Text {
-                        text: "Name:"
-                        color: "#cccccc"
+                    background: Rectangle {
+                        color: "#2a2a2a"
+                        border.color: "#404040"
+                        radius: 5
                     }
-                    TextField {
-                        id: nameField
-                        Layout.fillWidth: true
-                        text: viewModel.starSystem ? viewModel.starSystem.name : ""
+                    
+                    label: Text {
                         color: "#ffffff"
-                        background: Rectangle {
-                            color: "#404040"
-                            border.color: "#606060"
-                            radius: 3
-                        }
-                        onEditingFinished: {
-                            if (viewModel.starSystem) viewModel.starSystem.name = text
-                        }
+                        text: parent.title
+                        font.bold: true
                     }
                     
-                    Text {
-                        text: "Star Type:"
-                        color: "#cccccc"
-                    }
-                    ComboBox {
-                        id: starTypeCombo
-                        Layout.fillWidth: true
-                        model: ["Red Dwarf", "Yellow Star", "Blue Star", "White Dwarf", "Red Giant", "Neutron Star", "Black Hole"]
-                        currentIndex: viewModel.starSystem ? viewModel.starSystem.starType : 1
+                    GridLayout {
+                        anchors.fill: parent
+                        columns: 2
+                        columnSpacing: 10
+                        rowSpacing: 10
                         
-                        background: Rectangle {
-                            color: "#404040"
-                            border.color: "#606060"
-                            radius: 3
+                        Text {
+                            text: "Name:"
+                            color: "#cccccc"
                         }
-                        
-                        contentItem: Text {
-                            text: parent.displayText
+                        TextField {
+                            id: nameField
+                            Layout.fillWidth: true
+                            text: starSystemViewModel ? starSystemViewModel.name : ""
                             color: "#ffffff"
-                            verticalAlignment: Text.AlignVCenter
-                            leftPadding: 10
-                        }
-                        
-                        onCurrentIndexChanged: {
-                            if (viewModel.starSystem) viewModel.starSystem.starType = currentIndex
-                        }
-                    }
-                    
-                    Text {
-                        text: "Mass (Solar masses):"
-                        color: "#cccccc"
-                    }
-                    SpinBox {
-                        id: massSpinBox
-                        Layout.fillWidth: true
-                        from: 1
-                        to: 10000
-                        stepSize: 1
-                        value: viewModel.starSystem ? Math.round(viewModel.starSystem.starMass * 100) : 100
-                        
-                        background: Rectangle {
-                            color: "#404040"
-                            border.color: "#606060"
-                            radius: 3
-                        }
-                        
-                        contentItem: TextInput {
-                            text: (parent.value / 100).toFixed(2)
-                            color: "#ffffff"
-                            horizontalAlignment: Qt.AlignHCenter
-                            verticalAlignment: Qt.AlignVCenter
-                            readOnly: !parent.editable
-                            validator: DoubleValidator {
-                                bottom: 0.01
-                                top: 100.00
-                                decimals: 2
+                            background: Rectangle {
+                                color: "#404040"
+                                border.color: "#606060"
+                                radius: 3
+                            }
+                            onEditingFinished: {
+                                if (starSystemViewModel) starSystemViewModel.name = text
                             }
                         }
                         
-                        onValueModified: {
-                            if (viewModel.starSystem) viewModel.starSystem.starMass = value / 100.0
+                        Text {
+                            text: "Star Type:"
+                            color: "#cccccc"
                         }
-                    }
-                    
-                    Text {
-                        text: "Temperature (K):"
-                        color: "#cccccc"
-                    }
-                    SpinBox {
-                        id: temperatureSpinBox
-                        Layout.fillWidth: true
-                        from: 1000
-                        to: 100000
-                        stepSize: 100
-                        value: viewModel.starSystem ? viewModel.starSystem.starTemperature : 5778
-                        
-                        background: Rectangle {
-                            color: "#404040"
-                            border.color: "#606060"
-                            radius: 3
-                        }
-                        
-                        contentItem: TextInput {
-                            text: parent.value.toString()
-                            color: "#ffffff"
-                            horizontalAlignment: Qt.AlignHCenter
-                            verticalAlignment: Qt.AlignVCenter
-                            readOnly: !parent.editable
+                        ComboBox {
+                            id: starTypeCombo
+                            Layout.fillWidth: true
+                            model: ["Red Dwarf", "Yellow Star", "Blue Star", "White Dwarf", "Red Giant", "Neutron Star", "Black Hole"]
+                            currentIndex: starSystemViewModel ? starSystemViewModel.starType : 1
+
+                            background: Rectangle {
+                                color: "#404040"
+                                border.color: "#606060"
+                                radius: 3
+                            }
+                            
+                            contentItem: Text {
+                                text: parent.displayText
+                                color: "#ffffff"
+                                verticalAlignment: Text.AlignVCenter
+                                leftPadding: 10
+                            }
+                            
+                            onCurrentIndexChanged: {
+                                if (starSystemViewModel) starSystemViewModel.starType = currentIndex
+                            }
                         }
                         
-                        onValueModified: {
-                            if (viewModel.starSystem) viewModel.starSystem.starTemperature = value
+                        Text {
+                            text: "Mass (Solar masses):"
+                            color: "#cccccc"
                         }
-                    }
-                    
-                    Text {
-                        text: "Luminosity (Solar luminosities):"
-                        color: "#cccccc"
-                    }
-                    SpinBox {
-                        id: luminositySpinBox
-                        Layout.fillWidth: true
-                        from: 1
-                        to: 1000000
-                        stepSize: 1
-                        value: viewModel.starSystem ? Math.round(viewModel.starSystem.starLuminosity * 1000) : 1000
-                        
-                        background: Rectangle {
-                            color: "#404040"
-                            border.color: "#606060"
-                            radius: 3
+                        SpinBox {
+                            id: massSpinBox
+                            Layout.fillWidth: true
+                            from: 1
+                            to: 10000
+                            stepSize: 1
+                            value: starSystemViewModel ? Math.round(starSystemViewModel.starMass * 100) : 100
+                            
+                            background: Rectangle {
+                                color: "#404040"
+                                border.color: "#606060"
+                                radius: 3
+                            }
+                            
+                            contentItem: TextInput {
+                                text: (parent.value / 100).toFixed(2)
+                                color: "#ffffff"
+                                horizontalAlignment: Qt.AlignHCenter
+                                verticalAlignment: Qt.AlignVCenter
+                                readOnly: !parent.editable
+                                validator: DoubleValidator {
+                                    bottom: 0.01
+                                    top: 100.00
+                                    decimals: 2
+                                }
+                            }
+                            
+                            onValueModified: {
+                                if (starSystemViewModel) starSystemViewModel.starMass = value / 100.0
+                            }
                         }
                         
-                        contentItem: TextInput {
-                            text: (parent.value / 1000).toFixed(3)
-                            color: "#ffffff"
-                            horizontalAlignment: Qt.AlignHCenter
-                            verticalAlignment: Qt.AlignVCenter
-                            readOnly: !parent.editable
+                        Text {
+                            text: "Temperature (K):"
+                            color: "#cccccc"
+                        }
+                        SpinBox {
+                            id: temperatureSpinBox
+                            Layout.fillWidth: true
+                            from: 1000
+                            to: 100000
+                            stepSize: 100
+                            value: starSystemViewModel ? starSystemViewModel.starTemperature : 5778
+
+                            background: Rectangle {
+                                color: "#404040"
+                                border.color: "#606060"
+                                radius: 3
+                            }
+                            
+                            contentItem: TextInput {
+                                text: parent.value.toString()
+                                color: "#ffffff"
+                                horizontalAlignment: Qt.AlignHCenter
+                                verticalAlignment: Qt.AlignVCenter
+                                readOnly: !parent.editable
+                            }
+                            
+                            onValueModified: {
+                                if (starSystemViewModel) starSystemViewModel.starTemperature = value
+                            }
                         }
                         
-                        onValueModified: {
-                            if (viewModel.starSystem) viewModel.starSystem.starLuminosity = value / 1000.0
+                        Text {
+                            text: "Luminosity (Solar luminosities):"
+                            color: "#cccccc"
+                        }
+                        SpinBox {
+                            id: luminositySpinBox
+                            Layout.fillWidth: true
+                            from: 1
+                            to: 100000
+                            stepSize: 1
+                            value: starSystemViewModel ? Math.round(starSystemViewModel.starLuminosity * 1000) : 1000
+
+                            background: Rectangle {
+                                color: "#404040"
+                                border.color: "#606060"
+                                radius: 3
+                            }
+                            
+                            contentItem: TextInput {
+                                text: (parent.value / 1000).toFixed(3)
+                                color: "#ffffff"
+                                horizontalAlignment: Qt.AlignHCenter
+                                verticalAlignment: Qt.AlignVCenter
+                                readOnly: !parent.editable
+                                validator: DoubleValidator {
+                                    bottom: 0.001
+                                    top: 100.000
+                                    decimals: 3
+                                }
+                            }
+                            
+                            onValueModified: {
+                                if (starSystemViewModel) starSystemViewModel.starLuminosity = value / 1000.0
+                            }
                         }
                     }
                 }
-            }
-            
-            // System Visualization Section
-            GroupBox {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 300
-                title: "System Visualization"
                 
-                background: Rectangle {
-                    color: "#2a2a2a"
-                    border.color: "#404040"
-                    radius: 5
-                }
-                
-                label: Text {
-                    color: "#ffffff"
-                    text: parent.title
-                    font.bold: true
-                }
-                
-                Rectangle {
-                    anchors.fill: parent
-                    color: "#0a0a0a"
-                    radius: 3
+                // System Visualization Section
+                GroupBox {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 300
+                    title: "System Visualization"
                     
-                    // Star at center
+                    background: Rectangle {
+                        color: "#2a2a2a"
+                        border.color: "#404040"
+                        radius: 5
+                    }
+                    
+                    label: Text {
+                        color: "#ffffff"
+                        text: parent.title
+                        font.bold: true
+                    }
+                    
                     Rectangle {
-                        id: starViz
-                        width: 20
-                        height: 20
-                        radius: 10
-                        anchors.centerIn: parent
-                        color: viewModel.starSystem ? viewModel.starSystem.starColor : "#ffff80"
-                        border.color: "#ffffff"
-                        border.width: 1
+                        anchors.fill: parent
+                        color: "#0a0a0a"
+                        radius: 3
                         
-                        // Star glow effect
+                        // Star at center
                         Rectangle {
+                            id: starViz
+                            width: 20
+                            height: 20
+                            radius: 10
                             anchors.centerIn: parent
-                            width: parent.width + 10
-                            height: parent.height + 10
-                            radius: (parent.width + 10) / 2
-                            color: parent.color
-                            opacity: 0.3
+                            color: (starSystemViewModel && starSystemViewModel.starSystem) ? starSystemViewModel.starSystem.color : "#ffff80"
+                            border.color: "#ffffff"
+                            border.width: 1
+                            
+                            // Star glow effect
+                            Rectangle {
+                                anchors.centerIn: parent
+                                width: parent.width + 10
+                                height: parent.height + 10
+                                radius: (parent.width + 10) / 2
+                                color: parent.color
+                                opacity: 0.3
+                            }
+                        }
+                        
+                        // Planet orbits and planets
+                        Repeater {
+                            model: starSystemViewModel ? starSystemViewModel.planetsModel : null
+
+                            Item {
+                                anchors.centerIn: parent
+                                
+                                // Orbit circle
+                                Rectangle {
+                                    id: orbit
+                                    width: model.orbitDistance * 2
+                                    height: model.orbitDistance * 2
+                                    radius: model.orbitDistance
+                                    anchors.centerIn: parent
+                                    color: "transparent"
+                                    border.color: "#404040"
+                                    border.width: 1
+                                    opacity: 0.5
+                                }
+                                
+                                // Planet
+                                Rectangle {
+                                    id: planet
+                                    width: 8 + model.size * 2
+                                    height: 8 + model.size * 2
+                                    radius: (8 + model.size * 2) / 2
+                                    color: getPlanetColor(model.type)
+                                    border.color: "#ffffff"
+                                    border.width: 1
+                                    x: parent.width/2 + model.orbitDistance - width/2
+                                    y: parent.height/2 - height/2
+                                    
+                                    ToolTip {
+                                        visible: planetMouseArea.containsMouse
+                                        text: model.name + "\nType: " + getPlanetTypeName(model.type) + 
+                                              "\nMoons: " + model.moons + 
+                                              "\nMass: " + model.mass.toFixed(2) + " Earth masses"
+                                        delay: 500
+                                    }
+                                    
+                                    MouseArea {
+                                        id: planetMouseArea
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        onClicked: {
+                                            planetListView.currentIndex = index
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
+                }
+                
+                // Planets Section
+                GroupBox {
+                    Layout.fillWidth: true
+                    title: "Planets"
                     
-                    // Planet orbits and planets
-                    Repeater {
-                        model: viewModel.starSystem ? viewModel.starSystem.planetsModel : null
+                    background: Rectangle {
+                        color: "#2a2a2a"
+                        border.color: "#404040"
+                        radius: 5
+                    }
+                    
+                    label: Text {
+                        color: "#ffffff"
+                        text: parent.title
+                        font.bold: true
+                    }
+                    
+                    ColumnLayout {
+                        anchors.fill: parent
                         
-                        Item {
-                            anchors.centerIn: parent
+                        RowLayout {
+                            Layout.fillWidth: true
                             
-                            // Orbit circle
-                            Rectangle {
-                                id: orbit
-                                width: model.orbitDistance * 2
-                                height: model.orbitDistance * 2
-                                radius: model.orbitDistance
-                                anchors.centerIn: parent
-                                color: "transparent"
-                                border.color: "#404040"
-                                border.width: 1
-                                opacity: 0.5
+                            Button {
+                                text: "Add Planet"
+                                background: Rectangle {
+                                    color: "#006600"
+                                    border.color: "#008800"
+                                    radius: 3
+                                }
+                                contentItem: Text {
+                                    text: parent.text
+                                    color: "#ffffff"
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                onClicked: {
+                                    if (starSystemViewModel) {
+                                        starSystemViewModel.addNewPlanet()
+                                    }
+                                }
                             }
                             
-                            // Planet
-                            Rectangle {
-                                id: planet
-                                width: 8 + model.size * 2
-                                height: 8 + model.size * 2
-                                radius: (8 + model.size * 2) / 2
-                                color: getPlanetColor(model.type)
-                                border.color: "#ffffff"
-                                border.width: 1
-                                x: parent.width/2 + model.orbitDistance - width/2
-                                y: parent.height/2 - height/2
+                            Button {
+                                text: "Remove Selected"
+                                enabled: planetListView.currentIndex >= 0
+                                background: Rectangle {
+                                    color: enabled ? "#cc0000" : "#444444"
+                                    border.color: enabled ? "#ff0000" : "#666666"
+                                    radius: 3
+                                }
+                                contentItem: Text {
+                                    text: parent.text
+                                    color: enabled ? "#ffffff" : "#999999"
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                onClicked: {
+                                    if (starSystemViewModel && planetListView.currentIndex >= 0) {
+                                        starSystemViewModel.removePlanet(planetListView.currentIndex)
+                                    }
+                                }
+                            }
+                            
+                            Item { Layout.fillWidth: true }
+                        }
+                        
+                        ListView {
+                            id: planetListView
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: Math.max(100, contentHeight)
+                            Layout.maximumHeight: 400
+                            clip: true
+                            model: starSystemViewModel ? starSystemViewModel.planetsModel : null
+                            
+                            delegate: Rectangle {
+                                width: planetListView.width
+                                height: 60
+                                color: ListView.isCurrentItem ? "#404040" : "#2a2a2a"
+                                border.color: "#606060"
+                                radius: 3
                                 
-                                ToolTip {
-                                    visible: planetMouseArea.containsMouse
-                                    text: model.name + "\\nType: " + getPlanetTypeName(model.type) + 
-                                          "\\nMoons: " + model.moons + 
-                                          "\\nMass: " + model.mass.toFixed(2) + " Earth masses"
-                                    delay: 500
+                                RowLayout {
+                                    anchors.fill: parent
+                                    anchors.margins: 10
+                                    spacing: 10
+                                    
+                                    Rectangle {
+                                        width: 20
+                                        height: 20
+                                        radius: 10
+                                        color: getPlanetColor(model.type)
+                                        border.color: "#ffffff"
+                                        border.width: 1
+                                    }
+                                    
+                                    ColumnLayout {
+                                        Layout.fillWidth: true
+                                        spacing: 2
+                                        
+                                        Text {
+                                            text: model.name
+                                            color: "#ffffff"
+                                            font.bold: true
+                                        }
+                                        
+                                        Text {
+                                            text: "Type: " + getPlanetTypeName(model.type) + ", Moons: " + model.moons
+                                            color: "#cccccc"
+                                            font.pixelSize: 12
+                                        }
+                                    }
+                                    
+                                    Text {
+                                        text: model.mass.toFixed(2) + " ME"
+                                        color: "#cccccc"
+                                        font.pixelSize: 12
+                                    }
                                 }
                                 
                                 MouseArea {
-                                    id: planetMouseArea
                                     anchors.fill: parent
-                                    hoverEnabled: true
-                                    onClicked: {
-                                        planetListView.currentIndex = index
-                                    }
+                                    onClicked: planetListView.currentIndex = index
                                 }
                             }
                         }
                     }
                 }
             }
-            
-            // Planets Section
-            GroupBox {
-                Layout.fillWidth: true
-                title: "Planets"
-                
-                background: Rectangle {
-                    color: "#2a2a2a"
-                    border.color: "#404040"
-                    radius: 5
-                }
-                
-                label: Text {
-                    color: "#ffffff"
-                    text: parent.title
-                    font.bold: true
-                }
-                
-                ColumnLayout {
-                    anchors.fill: parent
-                    
-                    RowLayout {
-                        Layout.fillWidth: true
-                        
-                        Button {
-                            text: "Add Planet"
-                            background: Rectangle {
-                                color: "#0066cc"
-                                border.color: "#0088ff"
-                                radius: 3
-                            }
-                            contentItem: Text {
-                                text: parent.text
-                                color: "#ffffff"
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                            }
-                            onClicked: {
-                                console.log("Add Planet button clicked")
-                                if (viewModel) {
-                                    console.log("ViewModel available, hasDataManager:", viewModel.hasDataManager())
-                                    viewModel.addPlanet()
-                                    if (viewModel.isAutoSaveEnabled) {
-                                        console.log("Auto-save enabled, calling saveSystemData")
-                                        viewModel.saveSystemData()
-                                    } else {
-                                        console.log("Auto-save disabled")
-                                    }
-                                } else {
-                                    console.log("Error: ViewModel not available")
-                                }
-                            }
-                        }
-                        
-                        Button {
-                            text: "Remove Selected"
-                            enabled: planetListView.currentIndex >= 0
-                            background: Rectangle {
-                                color: enabled ? "#cc3300" : "#666666"
-                                border.color: enabled ? "#ff4400" : "#888888"
-                                radius: 3
-                            }
-                            contentItem: Text {
-                                text: parent.text
-                                color: "#ffffff"
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                            }
-                            onClicked: {
-                                if (viewModel && planetListView.currentIndex >= 0) {
-                                    viewModel.removePlanet(planetListView.currentIndex)
-                                    planetListView.currentIndex = -1
-                                    if (viewModel.isAutoSaveEnabled) viewModel.saveSystemData()
-                                }
-                            }
-                        }
-                        
-                        Item { Layout.fillWidth: true }
-                    }
-                    
-                    ListView {
-                        id: planetListView
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: Math.max(100, contentHeight)
-                        Layout.maximumHeight: 400
-                        clip: true
-                        model: viewModel.starSystem ? viewModel.starSystem.planetsModel : []
-                        
-                        delegate: PlanetPropertyView{
-                            width: planetListView.width
-                            isCurrentItem: ListView.isCurrentItem
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    // Footer with Import/Export and Close buttons
-    footer: ToolBar {
-        background: Rectangle {
-            color: "#2a2a2a"
-            border.color: "#404040"
         }
         
+        // Button row at the bottom (outside ScrollView)
         RowLayout {
-            anchors.fill: parent
-            //anchors.margins: 10
-            
-            // Auto-save toggle
-            CheckBox {
-                id: autoSaveCheck
-                text: "Auto-save"
-                checked: viewModel.isAutoSaveEnabled
-                
-                background: Rectangle {
-                    color: "transparent"
-                }
-                
-                contentItem: Text {
-                    text: parent.text
-                    color: "#ffffff"
-                    leftPadding: parent.indicator.width + parent.spacing
-                    verticalAlignment: Text.AlignVCenter
-                }
-                
-                onCheckedChanged: {
-                    viewModel.isAutoSaveEnabled = checked
-                }
-            }
-            
-            // Export button
-            Button {
-                text: "Export XML"
-                enabled: !viewModel.isSaving && !viewModel.isLoading
-                background: Rectangle {
-                    color: enabled ? "#006600" : "#444444"
-                    border.color: enabled ? "#008800" : "#666666"
-                    radius: 3
-                }
-                contentItem: Text {
-                    text: parent.text
-                    color: enabled ? "#ffffff" : "#999999"
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-                onClicked: exportDialog.open()
-            }
-            
-            // Import button
-            Button {
-                text: "Import XML"
-                enabled: !viewModel.isSaving && !viewModel.isLoading
-                background: Rectangle {
-                    color: enabled ? "#0066cc" : "#444444"
-                    border.color: enabled ? "#0088ff" : "#666666"
-                    radius: 3
-                }
-                contentItem: Text {
-                    text: parent.text
-                    color: enabled ? "#ffffff" : "#999999"
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-                onClicked: importDialog.open()
-            }
+            Layout.fillWidth: true
+            Layout.preferredHeight: 50
+            spacing: 10
             
             // Save button
             Button {
-                text: "Save Now"
+                text: "Save"
                 background: Rectangle {
                     color: "#cc6600"
                     border.color: "#ff8800"
@@ -523,37 +481,11 @@ ApplicationWindow {
         }
     }
     
-    // File Dialogs
-    Platform.FileDialog {
-        id: exportDialog
-        title: "Export System Data"
-        fileMode: Platform.FileDialog.SaveFile
-        nameFilters: ["XML files (*.xml)"]
-        defaultSuffix: "xml"
-        folder: Platform.StandardPaths.writableLocation(Platform.StandardPaths.DocumentsLocation)
-        
-        onAccepted: {
-            viewModel.exportToXml(file)
-        }
-    }
-    
-    Platform.FileDialog {
-        id: importDialog
-        title: "Import System Data"
-        fileMode: Platform.FileDialog.OpenFile
-        nameFilters: ["XML files (*.xml)"]
-        folder: Platform.StandardPaths.writableLocation(Platform.StandardPaths.DocumentsLocation)
-        
-        onAccepted: {
-            viewModel.importFromXml(file)
-        }
-    }
-    
     // Status label for feedback
     Text {
         id: statusLabel
         visible: text !== ""
-        text: viewModel.statusMessage
+        text: starSystemViewModel ? starSystemViewModel.statusMessage : ""
         color: "#ffff00"
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
@@ -563,8 +495,8 @@ ApplicationWindow {
             id: statusTimer
             interval: 3000
             onTriggered: {
-                if (viewModel) {
-                    viewModel.clearStatusMessage()
+                if (starSystemViewModel) {
+                    starSystemViewModel.clearStatusMessage()
                 }
             }
         }
@@ -578,70 +510,42 @@ ApplicationWindow {
     
     // Component initialization
     Component.onCompleted: {
-        // ViewModel handles all data manager interactions
-        console.log("SystemPropertiesDialog initialized with ViewModel")
-        // Load any existing data for this system
+        console.log("SystemPropertiesDialog initialized with starSystemViewModel")
         loadSystemData()
     }
     
     // Helper functions
     function saveSystemData() {
-        if (viewModel) {
-            return viewModel.saveSystemData()
+        if (starSystemViewModel) {
+            return starSystemViewModel.saveSystemData()
         }
         return false
     }
     
     function loadSystemData() {
-        if (viewModel) {
-            return viewModel.loadSystemData()
+        if (starSystemViewModel) {
+            return starSystemViewModel.loadSystemData()
         }
         return false
     }
     
     function refreshUI() {
         // Force UI refresh by updating bound properties
-        if (viewModel.starSystem) {
-            nameField.text = viewModel.starSystem.name
-            starTypeCombo.currentIndex = viewModel.starSystem.starType
-            massSpinBox.value = Math.round(viewModel.starSystem.starMass * 100)
-            temperatureSpinBox.value = viewModel.starSystem.starTemperature
-            luminositySpinBox.value = Math.round(viewModel.starSystem.starLuminosity * 1000)
+        if (starSystemViewModel && starSystemViewModel.starSystem) {
+            nameField.text = starSystemViewModel.starSystem.name
+            starTypeCombo.currentIndex = starSystemViewModel.starSystem.starType
+            massSpinBox.value = Math.round(starSystemViewModel.starSystem.starMass * 100)
+            temperatureSpinBox.value = starSystemViewModel.starSystem.starTemperature
+            luminositySpinBox.value = Math.round(starSystemViewModel.starSystem.starLuminosity * 1000)
         }
     }
     
-    function setupAutoSave() {
-        if (!viewModel.isAutoSaveEnabled || !viewModel.starSystem) return
-        
-        // Connect to all value change signals for auto-save
-        nameField.editingFinished.connect(function() {
-            if (viewModel.isAutoSaveEnabled) viewModel.saveSystemData()
-        })
-        
-        starTypeCombo.currentIndexChanged.connect(function() {
-            if (viewModel.isAutoSaveEnabled) viewModel.saveSystemData()
-        })
-        
-        massSpinBox.valueModified.connect(function() {
-            if (viewModel.isAutoSaveEnabled) viewModel.saveSystemData()
-        })
-        
-        temperatureSpinBox.valueModified.connect(function() {
-            if (viewModel.isAutoSaveEnabled) viewModel.saveSystemData()
-        })
-        
-        luminositySpinBox.valueModified.connect(function() {
-            if (viewModel.isAutoSaveEnabled) viewModel.saveSystemData()
-        })
-    }
-    
-    // Auto-save setup when viewModel changes
+    // Auto-setup when starSystemViewModel changes
     Connections {
-        target: viewModel
+        target: starSystemViewModel
         function onStarSystemChanged() {
-            if (viewModel.starSystem) {
+            if (starSystemViewModel && starSystemViewModel.starSystem) {
                 loadSystemData()
-                setupAutoSave()
             }
         }
     }

@@ -1,9 +1,11 @@
 #ifndef GGH_GALAXYCORE_VIEWMODELS_STARSYSTEMVIEWMODEL_H
 #define GGH_GALAXYCORE_VIEWMODELS_STARSYSTEMVIEWMODEL_H
 
+#include <QColor>
 #include <QObject>
 #include <QString>
 #include <QAbstractListModel>
+#include <QtQml>
 #include <memory>
 #include "ggh/modules/GalaxyCore/models/StarSystemModel.h"
 #include "ggh/modules/GalaxyCore/utilities/Common.h"
@@ -24,12 +26,14 @@ class PlanetListModel; // Forward declaration
  */
 class StarSystemViewModel : public QObject {
     Q_OBJECT
+    QML_ELEMENT
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(quint32 systemId READ systemId CONSTANT)
     Q_PROPERTY(double positionX READ positionX WRITE setPositionX NOTIFY positionChanged)
     Q_PROPERTY(double positionY READ positionY WRITE setPositionY NOTIFY positionChanged)
     Q_PROPERTY(int starType READ starType WRITE setStarType NOTIFY starTypeChanged)
     Q_PROPERTY(int systemSize READ systemSize WRITE setSystemSize NOTIFY systemSizeChanged)
+    Q_PROPERTY(QColor color READ color NOTIFY colorChanged)
     Q_PROPERTY(QAbstractListModel* planets READ planets CONSTANT)
 
 public:
@@ -43,6 +47,7 @@ public:
     double positionY() const;
     int starType() const;
     int systemSize() const;
+    QColor color() const;
     QAbstractListModel* planets();
 
     // Property setters
@@ -67,6 +72,7 @@ public:
     Q_INVOKABLE int planetCount() const;
 
 signals:
+    void colorChanged();
     void nameChanged();
     void positionChanged();
     void starTypeChanged();
