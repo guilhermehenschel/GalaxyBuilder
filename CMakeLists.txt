@@ -31,6 +31,11 @@ if(BUILD_QT_APP)
     add_subdirectory(app)
 endif()
 
+# Enable testing if requested
+if(BUILD_TESTING)
+    enable_testing()
+endif()
+
 # Include packaging configuration
 include(cmake/PackagingConfig.cmake)
 
