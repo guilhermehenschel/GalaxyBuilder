@@ -9,6 +9,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
+qt_policy(SET QTP0001 NEW)
+
 qt_add_qml_module(GalaxyCoreUtilities
     URI GalaxyCore.Utilities
     OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/qml/GalaxyCore/Utilities

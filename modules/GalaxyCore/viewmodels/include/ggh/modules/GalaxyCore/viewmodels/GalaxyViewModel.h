@@ -2,16 +2,16 @@
 #define GGH_GALAXYCORE_VIEWMODELS_GALAXYVIEWMODEL_H
 
 #include <QObject>
+#include <QAbstractItemModel>
 #include <QAbstractListModel>
 #include <QString>
 #include <memory>
+#include <QtQml/qqml.h>
 
 #include "ggh/modules/GalaxyCore/models/GalaxyModel.h"
 #include "ggh/modules/GalaxyCore/models/StarSystemModel.h"
-
+#include "ggh/modules/GalaxyCore/viewmodels/StarSystemListModel.h"
 namespace ggh::GalaxyCore::viewmodels {
-
-class StarSystemListModel;
 
 class GalaxyViewModel : public QObject
 {
@@ -20,7 +20,9 @@ class GalaxyViewModel : public QObject
     Q_PROPERTY(qint32 width READ width WRITE setWidth NOTIFY dimensionsChanged)
     Q_PROPERTY(qint32 height READ height WRITE setHeight NOTIFY dimensionsChanged)
     Q_PROPERTY(quint32 systemCount READ systemCount NOTIFY systemCountChanged)
-    Q_PROPERTY(QAbstractListModel* starSystems READ starSystems CONSTANT)
+    Q_PROPERTY(ggh::GalaxyCore::viewmodels::StarSystemListModel* starSystems READ starSystems CONSTANT)
+
+    QML_ELEMENT
 
 public:
     explicit GalaxyViewModel(QObject* parent = nullptr);
@@ -30,7 +32,7 @@ public:
     qint32 width() const;
     qint32 height() const;
     quint32 systemCount() const;
-    QAbstractListModel* starSystems();
+    StarSystemListModel* starSystems();
 
     // Property setters
     void setWidth(qint32 width);
@@ -57,36 +59,6 @@ private:
     std::shared_ptr<models::GalaxyModel> m_galaxy;
     std::unique_ptr<StarSystemListModel> m_starSystemsModel;
 };
-
-class StarSystemListModel : public QAbstractListModel
-{
-    Q_OBJECT
-
-public:
-    enum Roles {
-        SystemIdRole = Qt::UserRole + 1,
-        NameRole,
-        PositionXRole,
-        PositionYRole,
-        StarTypeRole,
-        SystemSizeRole,
-        PlanetCountRole
-    };
-
-    explicit StarSystemListModel(std::shared_ptr<models::GalaxyModel> galaxy, QObject* parent = nullptr);
-
-    // QAbstractListModel interface
-    int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
-    QHash<int, QByteArray> roleNames() const override;
-
-    // Model update methods
-    void refresh();
-
-private:
-    std::shared_ptr<models::GalaxyModel> m_galaxy;
-};
-
 } // namespace ggh::GalaxyCore::viewmodels
 
 Q_DECLARE_METATYPE(ggh::GalaxyCore::viewmodels::GalaxyViewModel*)

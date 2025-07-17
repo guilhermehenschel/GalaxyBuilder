@@ -8,6 +8,7 @@
 #include "ggh/modules/GalaxyCore/models/StarSystemModel.h"
 #include "ggh/modules/GalaxyCore/utilities/Common.h"
 #include "ggh/modules/GalaxyCore/utilities/Coordinates.h"
+#include "ggh/modules/GalaxyCore/viewmodels/PlanetListModel.h"
 
 namespace ggh::GalaxyCore::viewmodels {
 
@@ -77,40 +78,6 @@ private:
     
     void initializePlanetsModel();
 };
-
-/**
- * @class PlanetListModel
- * @brief Abstract list model for planets in a star system
- */
-class PlanetListModel : public QAbstractListModel {
-    Q_OBJECT
-
-public:
-    enum PlanetRoles {
-        NameRole = Qt::UserRole + 1,
-        TypeRole,
-        SizeRole,
-        MassRole,
-        MoonsRole,
-        OrbitRole,
-        MaxTempRole,
-        MinTempRole
-    };
-
-    explicit PlanetListModel(std::shared_ptr<models::StarSystemModel> starSystem, QObject* parent = nullptr);
-
-    // QAbstractListModel interface
-    int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
-    QHash<int, QByteArray> roleNames() const override;
-
-    // Model mutation methods
-    void refresh();
-
-private:
-    std::shared_ptr<models::StarSystemModel> m_starSystem;
-};
-
 } // namespace ggh::GalaxyCore::viewmodels
 
 #endif // GGH_GALAXYCORE_VIEWMODELS_STARSYSTEMVIEWMODEL_H

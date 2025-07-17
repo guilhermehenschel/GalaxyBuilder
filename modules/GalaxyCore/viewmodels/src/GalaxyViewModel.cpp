@@ -34,7 +34,7 @@ quint32 GalaxyViewModel::systemCount() const
     return static_cast<quint32>(m_galaxy->getAllStarSystems().size());
 }
 
-QAbstractListModel* GalaxyViewModel::starSystems()
+StarSystemListModel* GalaxyViewModel::starSystems()
 {
     return m_starSystemsModel.get();
 }
@@ -131,69 +131,4 @@ void GalaxyViewModel::initializeStarSystemsModel()
 {
     m_starSystemsModel = std::make_unique<StarSystemListModel>(m_galaxy, this);
 }
-
-// StarSystemListModel implementation
-StarSystemListModel::StarSystemListModel(std::shared_ptr<models::GalaxyModel> galaxy, QObject* parent)
-    : QAbstractListModel(parent), m_galaxy(galaxy)
-{
-}
-
-int StarSystemListModel::rowCount(const QModelIndex& parent) const
-{
-    Q_UNUSED(parent)
-    return m_galaxy ? static_cast<int>(m_galaxy->getAllStarSystems().size()) : 0;
-}
-
-QVariant StarSystemListModel::data(const QModelIndex& index, int role) const
-{
-    if (!m_galaxy || !index.isValid()) {
-        return QVariant();
-    }
-    
-    auto systems = m_galaxy->getAllStarSystems();
-    if (index.row() >= static_cast<int>(systems.size())) {
-        return QVariant();
-    }
-
-    const auto& system = systems[index.row()];
-
-    switch (role) {
-        case SystemIdRole:
-            return static_cast<quint32>(system->getId());
-        case NameRole:
-            return QString::fromStdString(system->getName());
-        case PositionXRole:
-            return system->getPosition().x;
-        case PositionYRole:
-            return system->getPosition().y;
-        case StarTypeRole:
-            return static_cast<int>(system->getStarType());
-        case SystemSizeRole:
-            return static_cast<int>(system->getSystemSize());
-        case PlanetCountRole:
-            return static_cast<int>(system->getPlanets().size());
-        default:
-            return QVariant();
-    }
-}
-
-QHash<int, QByteArray> StarSystemListModel::roleNames() const
-{
-    QHash<int, QByteArray> roles;
-    roles[SystemIdRole] = "systemId";
-    roles[NameRole] = "name";
-    roles[PositionXRole] = "positionX";
-    roles[PositionYRole] = "positionY";
-    roles[StarTypeRole] = "starType";
-    roles[SystemSizeRole] = "systemSize";
-    roles[PlanetCountRole] = "planetCount";
-    return roles;
-}
-
-void StarSystemListModel::refresh()
-{
-    beginResetModel();
-    endResetModel();
-}
-
 } // namespace ggh::GalaxyCore::viewmodels

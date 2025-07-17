@@ -26,14 +26,23 @@ using Planet = ggh::GalaxyCore::models::Planet;
 using TravelLaneModel = ggh::GalaxyCore::models::TravelLaneModel;
 
 
-namespace ggh::GalaxyFactories {
+namespace{
+
 template<typename T>
-bool XmlGalaxyImporter::validateXmlElement(const QDomElement& element){
-    if(element.isNull()) {
+concept HasXmlTag = requires {
+    { T::xmlTag() } -> std::convertible_to<std::string>;
+};
+
+template <HasXmlTag T>
+bool validateXmlElement(const QDomElement& element) {
+    if (element.isNull()) {
         qWarning() << "Invalid XML element: Element is null";
         return false;
     }
-    // Generic validation - specific validation can be added in specializations
+    if (element.tagName() != T::xmlTag()) {
+        qWarning() << "Invalid XML element: Expected tag" << T::xmlTag() << "but found" << element.tagName();
+        return false;
+    }
     return true;
 }
 }

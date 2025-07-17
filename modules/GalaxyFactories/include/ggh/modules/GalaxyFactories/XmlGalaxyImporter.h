@@ -127,14 +127,6 @@ private:
      * @return True if the XML is valid, false otherwise.
      */
     bool validateXml(const QDomDocument& doc) const;
-
-    /**
-     * @brief Validates a single XML element.
-     * @param element The XML element to validate.
-     * @return True if the element is valid, false otherwise.
-     */
-    template<typename T>
-    bool validateXmlElement(const QDomElement& element);
 };
 }
 

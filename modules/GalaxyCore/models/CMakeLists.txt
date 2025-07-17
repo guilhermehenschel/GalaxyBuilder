@@ -9,6 +9,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
+# Set Qt policies
+qt_policy(SET QTP0001 NEW)
+
 set(HEADER_FILES
     include/ggh/modules/GalaxyCore/models/GalaxyModel.h
     include/ggh/modules/GalaxyCore/models/PlanetModel.h
