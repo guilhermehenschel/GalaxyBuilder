@@ -17,7 +17,6 @@ set(HEADER_FILES
     include/ggh/modules/GalaxyCore/models/PlanetModel.h
     include/ggh/modules/GalaxyCore/models/StarSystemModel.h
     include/ggh/modules/GalaxyCore/models/TravelLaneModel.h
-    include/ggh/modules/GalaxyCore/models/QmlModels.h
 )
 
 set(SRC_FILES
@@ -25,14 +24,12 @@ set(SRC_FILES
     src/PlanetModel.cpp
     src/StarSystemModel.cpp
     src/TravelLaneModel.cpp
-    src/QmlModels.cpp
 )
 
 qt_add_qml_module(GalaxyCoreModels
     URI GalaxyCore.Model
     VERSION 1.0
     OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/qml/GalaxyCore/Model
-    RESOURCE_PREFIX /unused
     SOURCES
         ${HEADER_FILES}
         ${SRC_FILES}
@@ -66,8 +63,6 @@ target_link_libraries(GalaxyCoreModels
 target_link_libraries(GalaxyCoreModelsLib
     PUBLIC
         GGH::GalaxyCore::Utilities
-        Qt6::Core
-        Qt6::Qml
 )
 
 # Compiler definitions for shared library export
