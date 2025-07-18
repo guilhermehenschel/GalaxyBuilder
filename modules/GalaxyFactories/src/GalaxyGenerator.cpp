@@ -68,30 +68,58 @@ void GalaxyGenerator::generateSpiralGalaxy(GalaxyModel& galaxy, const Generation
     const double centerX = params.width / 2.0;
     const double centerY = params.height / 2.0;
     const double maxRadius = std::min(params.width, params.height) / 2.0 * params.edgeRadius;
+    const double minRadius = maxRadius * params.coreRadius;
     
+    SystemId systemId = 1;
+    int systemsGenerated = 0;
+    int maxAttempts = static_cast<int>(params.systemCount) * 10;
+    int attempts = 0;
+    
+    // Calculate systems per arm for even distribution
     int systemsPerArm = params.systemCount / static_cast<int>(params.spiralArms);
     int remainingSystems = params.systemCount % static_cast<int>(params.spiralArms);
     
-    SystemId systemId = 1;
-    
-    for (int arm = 0; arm < static_cast<int>(params.spiralArms); ++arm) {
+    for (int arm = 0; arm < static_cast<int>(params.spiralArms) && systemsGenerated < static_cast<int>(params.systemCount); ++arm) {
         int systemsInThisArm = systemsPerArm + (arm < remainingSystems ? 1 : 0);
-        double armOffset = (2.0 *GalaxyCore::utilities::PI * arm) / params.spiralArms;
         
-        for (int i = 0; i < systemsInThisArm; ++i) {
-            double t = static_cast<double>(i) / systemsInThisArm;
-            double radius = params.coreRadius * maxRadius + 
-                           (maxRadius - params.coreRadius * maxRadius) * t;
-            double angle = armOffset + t * params.spiralTightness * 4.0 * GalaxyCore::utilities::PI;
+        for (int systemInArm = 0; systemInArm < systemsInThisArm && attempts < maxAttempts; ++systemInArm) {
+            // Progress along this arm (0.0 = center, 1.0 = edge)
+            double armProgress = static_cast<double>(systemInArm) / static_cast<double>(systemsInThisArm - 1);
+            if (systemsInThisArm == 1) armProgress = 0.5; // Single system goes in middle
             
-            CartesianCoordinates pos = generateSpiralPosition(angle, radius, armOffset, params);
-            pos.x += centerX;
-            pos.y += centerY;
+            // Calculate radius from center (logarithmic distribution looks more natural)
+            double radius = minRadius + (maxRadius - minRadius) * std::pow(armProgress, 0.8);
             
-            if (isValidSystemPosition(galaxy, pos)) {
-                std::string systemName = "System_" + std::to_string(systemId);
-                galaxy.addStarSystem(systemId++, systemName, pos, generateRandomStarType());
+            // Calculate angle - logarithmic spiral formula
+            double baseAngle = (2.0 * GalaxyCore::utilities::PI * arm) / params.spiralArms;
+            double spiralAngle = baseAngle + armProgress * params.spiralTightness * 2.0 * GalaxyCore::utilities::PI;
+            
+            // Add small random offset for natural look (much less than before)
+            double randomAngleOffset = (m_realDist(m_rng) - 0.5) * 0.2;
+            double randomRadiusOffset = (m_realDist(m_rng) - 0.5) * (maxRadius * 0.05);
+            
+            double finalAngle = spiralAngle + randomAngleOffset;
+            double finalRadius = radius + randomRadiusOffset;
+            
+            // Convert to Cartesian coordinates
+            double x = centerX + finalRadius * std::cos(finalAngle);
+            double y = centerY + finalRadius * std::sin(finalAngle);
+            
+            CartesianCoordinates pos(x, y);
+            
+            // Check bounds and validity
+            if (pos.x >= 0 && pos.x < params.width && pos.y >= 0 && pos.y < params.height) {
+                if (isValidSystemPosition(galaxy, pos) || attempts > static_cast<int>(params.systemCount) * 3) {
+                    std::string systemName = "System_" + std::to_string(systemId);
+                    galaxy.addStarSystem(systemId++, systemName, pos, generateRandomStarType());
+                    systemsGenerated++;
+                } else {
+                    systemInArm--; // Try this position again
+                }
+            } else {
+                systemInArm--; // Try this position again
             }
+            attempts++;
         }
     }
 }
@@ -103,19 +131,28 @@ void GalaxyGenerator::generateEllipticalGalaxy(GalaxyModel& galaxy, const Genera
     const double maxRadiusY = params.height / 2.0 * params.edgeRadius * 0.6; // Make it elliptical
     
     SystemId systemId = 1;
+    int systemsGenerated = 0;
+    int maxAttempts = static_cast<int>(params.systemCount) * 10; // Maximum attempts to avoid infinite loops
+    int attempts = 0;
     
-    for (GalaxySize i = 0; i < params.systemCount; ++i) {
-        double angle = m_realDist(m_rng) * 2.0 *GalaxyCore::utilities::PI;
+    while (systemsGenerated < static_cast<int>(params.systemCount) && attempts < maxAttempts) {
+        double angle = m_realDist(m_rng) * 2.0 * GalaxyCore::utilities::PI;
         double r = std::sqrt(m_realDist(m_rng)); // Square root for uniform distribution
         
         double x = centerX + r * maxRadiusX * std::cos(angle);
         double y = centerY + r * maxRadiusY * std::sin(angle);
         
         CartesianCoordinates pos(x, y);
-        if (isValidSystemPosition(galaxy, pos)) {
-            std::string systemName = "System_" + std::to_string(systemId);
-            galaxy.addStarSystem(systemId++, systemName, pos, generateRandomStarType());
+        
+        // Check bounds
+        if (pos.x >= 0 && pos.x < params.width && pos.y >= 0 && pos.y < params.height) {
+            if (isValidSystemPosition(galaxy, pos) || attempts > static_cast<int>(params.systemCount) * 5) {
+                std::string systemName = "System_" + std::to_string(systemId);
+                galaxy.addStarSystem(systemId++, systemName, pos, generateRandomStarType());
+                systemsGenerated++;
+            }
         }
+        attempts++;
     }
 }
 
@@ -126,35 +163,50 @@ void GalaxyGenerator::generateRingGalaxy(GalaxyModel& galaxy, const GenerationPa
     const double outerRadius = std::min(params.width, params.height) / 2.0 * params.edgeRadius;
     
     SystemId systemId = 1;
+    int systemsGenerated = 0;
+    int maxAttempts = static_cast<int>(params.systemCount) * 10; // Maximum attempts to avoid infinite loops
+    int attempts = 0;
     
-    for (GalaxySize i = 0; i < params.systemCount; ++i) {
-        double angle = m_realDist(m_rng) * 2.0 *GalaxyCore::utilities::PI;
+    while (systemsGenerated < static_cast<int>(params.systemCount) && attempts < maxAttempts) {
+        double angle = m_realDist(m_rng) * 2.0 * GalaxyCore::utilities::PI;
         double r = innerRadius + (outerRadius - innerRadius) * m_realDist(m_rng);
         
         double x = centerX + r * std::cos(angle);
         double y = centerY + r * std::sin(angle);
         
         CartesianCoordinates pos(x, y);
-        if (isValidSystemPosition(galaxy, pos)) {
-            std::string systemName = "System_" + std::to_string(systemId);
-            galaxy.addStarSystem(systemId++, systemName, pos, generateRandomStarType());
+        
+        // Check bounds
+        if (pos.x >= 0 && pos.x < params.width && pos.y >= 0 && pos.y < params.height) {
+            if (isValidSystemPosition(galaxy, pos) || attempts > static_cast<int>(params.systemCount) * 5) {
+                std::string systemName = "System_" + std::to_string(systemId);
+                galaxy.addStarSystem(systemId++, systemName, pos, generateRandomStarType());
+                systemsGenerated++;
+            }
         }
+        attempts++;
     }
 }
 
 void GalaxyGenerator::generateClusterGalaxy(GalaxyModel& galaxy, const GenerationParameters& params) {
     const int numClusters = 3 + m_intDist(m_rng) % 4; // 3-6 clusters
-    const int systemsPerCluster = params.systemCount / numClusters;
+    const int systemsPerCluster = (static_cast<int>(params.systemCount) + numClusters - 1) / numClusters; // Round up division
     
     SystemId systemId = 1;
+    int totalSystemsGenerated = 0;
     
-    for (int cluster = 0; cluster < numClusters; ++cluster) {
+    for (int cluster = 0; cluster < numClusters && totalSystemsGenerated < static_cast<int>(params.systemCount); ++cluster) {
         double clusterX = m_realDist(m_rng) * params.width;
         double clusterY = m_realDist(m_rng) * params.height;
         double clusterRadius = 50 + m_realDist(m_rng) * 100;
         
-        for (int i = 0; i < systemsPerCluster; ++i) {
-            double angle = m_realDist(m_rng) * 2.0 *GalaxyCore::utilities::PI;
+        int systemsInThisCluster = std::min(systemsPerCluster, static_cast<int>(params.systemCount) - totalSystemsGenerated);
+        int systemsGenerated = 0;
+        int maxAttempts = systemsInThisCluster * 10;
+        int attempts = 0;
+        
+        while (systemsGenerated < systemsInThisCluster && attempts < maxAttempts) {
+            double angle = m_realDist(m_rng) * 2.0 * GalaxyCore::utilities::PI;
             double r = m_realDist(m_rng) * clusterRadius;
             
             double x = clusterX + r * std::cos(angle);
@@ -162,11 +214,15 @@ void GalaxyGenerator::generateClusterGalaxy(GalaxyModel& galaxy, const Generatio
             
             CartesianCoordinates pos(x, y);
             if (pos.x >= 0 && pos.x < params.width && 
-                pos.y >= 0 && pos.y < params.height &&
-                isValidSystemPosition(galaxy, pos)) {
-                std::string systemName = "System_" + std::to_string(systemId);
-                galaxy.addStarSystem(systemId++, systemName, pos, generateRandomStarType());
+                pos.y >= 0 && pos.y < params.height) {
+                if (isValidSystemPosition(galaxy, pos) || attempts > systemsInThisCluster * 5) {
+                    std::string systemName = "System_" + std::to_string(systemId);
+                    galaxy.addStarSystem(systemId++, systemName, pos, generateRandomStarType());
+                    systemsGenerated++;
+                    totalSystemsGenerated++;
+                }
             }
+            attempts++;
         }
     }
 }
@@ -176,12 +232,10 @@ CartesianCoordinates GalaxyGenerator::generateSpiralPosition(double angle, doubl
     Q_UNUSED(armOffset)
     Q_UNUSED(params)
     
-    // Add some randomness to make it look more natural
-    double randomAngle = angle + (m_realDist(m_rng) - 0.5) * 0.5;
-    double randomRadius = radius + (m_realDist(m_rng) - 0.5) * 30.0;
-    
-    double x = randomRadius * std::cos(randomAngle);
-    double y = randomRadius * std::sin(randomAngle);
+    // Simple conversion from polar to Cartesian coordinates
+    // Randomness is now handled in the main spiral generation function
+    double x = radius * std::cos(angle);
+    double y = radius * std::sin(angle);
     
     return CartesianCoordinates(x, y);
 }

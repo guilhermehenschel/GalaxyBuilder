@@ -52,11 +52,16 @@ void GalaxyController::initializeModels()
     // Create the galaxy generator
     m_galaxyGenerator = new ggh::GalaxyFactories::GalaxyGenerator();
     
-    // Set up default parameters
+    // Set up default parameters and sync with member variables
     ggh::GalaxyFactories::GenerationParameters defaultParams;
-    defaultParams.systemCount = 50;
-    defaultParams.width = 1000;
-    defaultParams.height = 1000;
+    defaultParams.systemCount = m_systemCount;
+    defaultParams.width = m_galaxyWidth;
+    defaultParams.height = m_galaxyHeight;
+    defaultParams.shape = static_cast<ggh::GalaxyCore::utilities::GalaxyShape>(m_galaxyShape);
+    defaultParams.spiralArms = m_spiralArms;
+    defaultParams.spiralTightness = m_spiralTightness;
+    defaultParams.coreRadius = m_coreRadius;
+    defaultParams.edgeRadius = m_edgeRadius;
     defaultParams.seed = QRandomGenerator::global()->bounded(1000000);
     m_galaxyGenerator->setParameters(defaultParams);
     
@@ -427,6 +432,11 @@ void GalaxyController::setGalaxyShape(int shape)
 {
     if (m_galaxyShape != shape) {
         m_galaxyShape = shape;
+        if (m_galaxyGenerator) {
+            auto params = m_galaxyGenerator->getParameters();
+            params.shape = static_cast<ggh::GalaxyCore::utilities::GalaxyShape>(shape);
+            m_galaxyGenerator->setParameters(params);
+        }
         emit galaxyShapeChanged();
     }
 }
@@ -440,6 +450,11 @@ void GalaxyController::setSpiralArms(int arms)
 {
     if (m_spiralArms != arms) {
         m_spiralArms = arms;
+        if (m_galaxyGenerator) {
+            auto params = m_galaxyGenerator->getParameters();
+            params.spiralArms = arms;
+            m_galaxyGenerator->setParameters(params);
+        }
         emit spiralArmsChanged();
     }
 }
@@ -453,6 +468,11 @@ void GalaxyController::setSpiralTightness(double tightness)
 {
     if (m_spiralTightness != tightness) {
         m_spiralTightness = tightness;
+        if (m_galaxyGenerator) {
+            auto params = m_galaxyGenerator->getParameters();
+            params.spiralTightness = tightness;
+            m_galaxyGenerator->setParameters(params);
+        }
         emit spiralTightnessChanged();
     }
 }
@@ -466,6 +486,11 @@ void GalaxyController::setCoreRadius(double radius)
 {
     if (m_coreRadius != radius) {
         m_coreRadius = radius;
+        if (m_galaxyGenerator) {
+            auto params = m_galaxyGenerator->getParameters();
+            params.coreRadius = radius;
+            m_galaxyGenerator->setParameters(params);
+        }
         emit coreRadiusChanged();
     }
 }
@@ -479,6 +504,11 @@ void GalaxyController::setEdgeRadius(double radius)
 {
     if (m_edgeRadius != radius) {
         m_edgeRadius = radius;
+        if (m_galaxyGenerator) {
+            auto params = m_galaxyGenerator->getParameters();
+            params.edgeRadius = radius;
+            m_galaxyGenerator->setParameters(params);
+        }
         emit edgeRadiusChanged();
     }
 }

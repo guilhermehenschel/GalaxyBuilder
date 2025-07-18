@@ -15,6 +15,7 @@ add_executable(GalaxyFactoriesTests
     test_GalaxyGenerator.cpp
     test_AbstractGalaxyFactory.cpp
     test_GalaxyGenerator_Full.cpp
+    test_GalaxyParameterRespect.cpp
 )
 
 target_link_libraries(GalaxyFactoriesTests PRIVATE
