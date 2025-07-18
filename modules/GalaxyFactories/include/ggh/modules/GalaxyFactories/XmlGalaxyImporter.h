@@ -2,15 +2,12 @@
 #define GGH_MODULES_GALAXYFACTORIES_XMLGALAXYIMPORTER_H
 
 #include "ggh/modules/GalaxyFactories/AbstractGalaxyFactory.h"
+#include "galaxyfactories_global.h"
 #include <expected>
 #include <memory>
 #include <QString>
-
-// Forward declarations
-class QDomDocument;
-class QDomElement;
-class QDomNode;
-class QDomNodeList;
+#include <QXmlStreamReader>
+#include <unordered_map>
 
 namespace ggh::GalaxyCore::models {
     class StarSystemModel;
@@ -23,7 +20,7 @@ namespace ggh::GalaxyFactories {
  * @file XmlGalaxyImporter.h
  * @brief Interface for importing galaxy data from XML files.
  */
-class XmlGalaxyImporter : public AbstractGalaxyFactory {
+class GALAXYFACTORIES_EXPORT XmlGalaxyImporter : public AbstractGalaxyFactory {
 public:
     /**
      * @brief Imports a galaxy from the specified XML file.
@@ -60,73 +57,42 @@ private:
     QString m_filePath; // Path to the XML file
 
     /**
-     * @brief Parses the XML file and populates the GalaxyModel.
+     * @brief Parses a StarSystem element using QXmlStreamReader.
      * @param galaxy The GalaxyModel to populate.
+     * @param systemMap Map to track systems for travel lane parsing.
+     * @param xml The XML stream reader.
      * @return True if parsing was successful, false otherwise.
      */
-    bool parseXmlFile(GalaxyModel& galaxy);
+    bool parseSystemFromStream(GalaxyModel* galaxy, 
+                              std::unordered_map<quint32, std::shared_ptr<StarSystemModel>>& systemMap,
+                              QXmlStreamReader& xml);
 
     /**
-     * @brief Converts the XML data to a GalaxyModel.
-     * @param xmlData The XML data to convert.
-     * @return A unique pointer to the populated GalaxyModel.
-     */
-    std::expected<std::unique_ptr<GalaxyModel>, std::string> convertXmlToGalaxyModel(const QString& xmlData);
-
-    /**
-     * @brief Parses System elements from the XML and adds them to the GalaxyModel.
+     * @brief Parses a TravelLane element using QXmlStreamReader.
      * @param galaxy The GalaxyModel to populate.
-     * @param systemsElement The XML element containing system data.
+     * @param systemMap Map to find referenced systems.
+     * @param xml The XML stream reader.
      * @return True if parsing was successful, false otherwise.
      */
-    bool parseSystems(std::shared_ptr<GalaxyModel> galaxy, const QDomNodeList& systemsNodeList);
+    bool parseTravelLaneFromStream(GalaxyModel* galaxy,
+                                  std::unordered_map<quint32, std::shared_ptr<StarSystemModel>>& systemMap,
+                                  QXmlStreamReader& xml);
 
     /**
-     * @brief Parses TravelLane elements from the XML and adds them to the GalaxyModel.
-     * @param galaxy The GalaxyModel to populate.
-     * @param lanesElement The XML element containing travel lane data.
-     * @return True if parsing was successful, false otherwise.
-     */
-    bool parseTravelLanes(std::shared_ptr<GalaxyModel> galaxy, const QDomNodeList& laneNodeList);
-
-    /**
-     * @brief Parses a single System element and adds it to the GalaxyModel.
-     * @param galaxy The GalaxyModel to populate.
-     * @param systemElement The XML element containing system data.
-     * @return True if parsing was successful, false otherwise.
-     */
-    bool parseSystem(std::shared_ptr<GalaxyModel> galaxy, const QDomElement& systemElement);
-
-    /**
-     * @brief Parses a single TravelLane element and adds it to the GalaxyModel.
-     * @param galaxy The GalaxyModel to populate.
-     * @param laneElement The XML element containing travel lane data.
-     * @return True if parsing was successful, false otherwise.
-     */
-    bool parseTravelLane(std::shared_ptr<GalaxyModel> galaxy, const QDomElement& laneElement);
-
-    /**
-     * @brief Parse planet data from the XML and adds it to the StarSystem
-     * @param system The StarSystem to populate.
-     * @param planetsElement The XML element containing planet data.
-     * @return True if parsing was successful, false otherwise.
-     */
-    bool parsePlanets(std::shared_ptr<StarSystemModel> system, const QDomNodeList& planetsElement);
-
-    /**
-     * @brief Parses a single Planet element and adds it to the StarSystemModel.
+     * @brief Parses a Planet element using QXmlStreamReader.
      * @param system The StarSystemModel to populate.
-     * @param planetElement The XML element containing planet data.
+     * @param xml The XML stream reader.
      * @return True if parsing was successful, false otherwise.
      */
-    bool parsePlanet(std::shared_ptr<StarSystemModel> system, const QDomElement& planetElement);
+    bool parsePlanetFromStream(std::shared_ptr<StarSystemModel> system, QXmlStreamReader& xml);
 
     /**
-     * @brief Validates the XML structure and data before importing.
-     * @param doc The XML document to validate.
-     * @return True if the XML is valid, false otherwise.
+     * @brief Updates galaxy dimensions based on system positions.
+     * @param galaxy The GalaxyModel to update.
+     * @param systemMap Map of all systems to calculate bounding box.
      */
-    bool validateXml(const QDomDocument& doc) const;
+    void updateGalaxyDimensions(GalaxyModel* galaxy,
+                               const std::unordered_map<quint32, std::shared_ptr<StarSystemModel>>& systemMap);
 };
 }
 

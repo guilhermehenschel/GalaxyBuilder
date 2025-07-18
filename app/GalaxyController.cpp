@@ -8,6 +8,7 @@ GalaxyController::GalaxyController(QObject *parent)
     , m_galaxyViewModel(nullptr)
     , m_galaxyGenerator(nullptr)
     , m_exporterObject(nullptr)
+    , m_xmlImporter(nullptr)
     , m_statusMessage("Ready")
     , m_isGenerating(false)
     , m_showSystemNames(true)
@@ -68,6 +69,9 @@ void GalaxyController::initializeModels()
     // Create the exporter object
     m_exporterObject = new ggh::Galaxy::Exporter::ExporterObject(this);
     
+    // Create the importer object
+    m_xmlImporter = new ggh::GalaxyFactories::XmlGalaxyImporter();
+    
     qDebug() << "GalaxyController initialized successfully";
 }
 
@@ -84,6 +88,11 @@ ggh::GalaxyFactories::GalaxyGenerator* GalaxyController::galaxyGenerator() const
 ggh::Galaxy::Exporter::ExporterObject* GalaxyController::exporterObject() const
 {
     return m_exporterObject;
+}
+
+ggh::GalaxyFactories::XmlGalaxyImporter* GalaxyController::xmlImporter() const
+{
+    return m_xmlImporter;
 }
 
 void GalaxyController::generateGalaxy()
@@ -284,6 +293,69 @@ void GalaxyController::exportStarSystem(const QString& systemName, const QString
         QString errorMsg = QString("Exception during star system export: %1").arg(e.what());
         qCritical() << errorMsg;
         emit exportFinished(false, errorMsg);
+    }
+}
+
+bool GalaxyController::importGalaxy(const QString& filePath)
+{
+    if (!m_xmlImporter) {
+        qWarning() << "XML importer not initialized";
+        emit importFinished(false, "XML importer not initialized");
+        return false;
+    }
+    
+    emit importStarted();
+    
+    try {
+        // Import the galaxy using the factory pattern
+        auto importedGalaxy = m_xmlImporter->importGalaxy(filePath);
+        
+        if (!importedGalaxy) {
+            QString errorMsg = QString("Failed to import galaxy from: %1").arg(filePath);
+            qWarning() << "Import failed:" << errorMsg;
+            emit importFinished(false, errorMsg);
+            return false;
+        }
+        
+        // Convert unique_ptr to shared_ptr
+        m_galaxyModel = std::shared_ptr<ggh::GalaxyCore::models::GalaxyModel>(importedGalaxy.release());
+        
+        // Update the view model
+        if (m_galaxyViewModel) {
+            m_galaxyViewModel->setGalaxy(m_galaxyModel);
+            emit galaxyViewModelChanged();
+        }
+        
+        // Update galaxy parameters to match imported galaxy
+        m_galaxyWidth = m_galaxyModel->getWidth();
+        m_galaxyHeight = m_galaxyModel->getHeight();
+        emit galaxyWidthChanged();
+        emit galaxyHeightChanged();
+        
+        // Update system count
+        m_systemCount = static_cast<int>(m_galaxyModel->getAllStarSystems().size());
+        emit systemCountChanged();
+        
+        // Clear selection
+        clearSelection();
+        
+        QString message = QString("Galaxy imported successfully from %1 (%2 systems, %3 travel lanes)")
+                            .arg(filePath)
+                            .arg(m_galaxyModel->getAllStarSystems().size())
+                            .arg(m_galaxyModel->getAllTravelLanes().size());
+        
+        qDebug() << message;
+        m_statusMessage = message;
+        emit statusMessageChanged();
+        emit importFinished(true, message);
+        
+        return true;
+        
+    } catch (const std::exception& e) {
+        QString errorMsg = QString("Exception during import: %1").arg(e.what());
+        qCritical() << errorMsg;
+        emit importFinished(false, errorMsg);
+        return false;
     }
 }
 

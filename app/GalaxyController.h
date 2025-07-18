@@ -18,6 +18,7 @@
 
 // GalaxyExporter includes
 #include "ggh/modules/GalaxyExporter/ExporterObject.h"
+#include "ggh/modules/GalaxyFactories/XmlGalaxyImporter.h"
 
 class GalaxyController : public QObject
 {
@@ -28,6 +29,7 @@ class GalaxyController : public QObject
     Q_PROPERTY(ggh::GalaxyCore::viewmodels::GalaxyViewModel* galaxyViewModel READ galaxyViewModel NOTIFY galaxyViewModelChanged)
     Q_PROPERTY(ggh::GalaxyFactories::GalaxyGenerator* galaxyGenerator READ galaxyGenerator NOTIFY galaxyGeneratorChanged)
     Q_PROPERTY(ggh::Galaxy::Exporter::ExporterObject* exporterObject READ exporterObject NOTIFY exporterObjectChanged)
+    Q_PROPERTY(ggh::GalaxyFactories::XmlGalaxyImporter* xmlImporter READ xmlImporter NOTIFY xmlImporterChanged)
     
     // System selection properties
     Q_PROPERTY(ggh::GalaxyCore::viewmodels::StarSystemViewModel* selectedStarSystemViewModel READ selectedStarSystemViewModel NOTIFY selectedStarSystemViewModelChanged)
@@ -62,6 +64,7 @@ public:
     ggh::GalaxyCore::viewmodels::GalaxyViewModel* galaxyViewModel() const;
     ggh::GalaxyFactories::GalaxyGenerator* galaxyGenerator() const;
     ggh::Galaxy::Exporter::ExporterObject* exporterObject() const;
+    ggh::GalaxyFactories::XmlGalaxyImporter* xmlImporter() const;
     
     // System selection property getters
     ggh::GalaxyCore::viewmodels::StarSystemViewModel* selectedStarSystemViewModel() const;
@@ -117,6 +120,9 @@ public slots:
     void exportStarSystem(const QString& systemName, const QString& filePath);
     void exportGalaxyImage(const QString& filePath, const QSize& size);
     
+    // Import functions
+    Q_INVOKABLE bool importGalaxy(const QString& filePath);
+    
     // Parameter management
     void setGenerationSeed(int seed);
     void setGalaxyDimensions(double width, double height);
@@ -126,6 +132,7 @@ signals:
     void galaxyViewModelChanged();
     void galaxyGeneratorChanged();
     void exporterObjectChanged();
+    void xmlImporterChanged();
     
     // System selection signals
     void selectedStarSystemViewModelChanged();
@@ -153,6 +160,8 @@ signals:
     void galaxyGenerationFinished();
     void exportStarted();
     void exportFinished(bool success, const QString& message);
+    void importStarted();
+    void importFinished(bool success, const QString& message);
 
 private:
     void initializeModels();
@@ -162,6 +171,7 @@ private:
     ggh::GalaxyCore::viewmodels::GalaxyViewModel* m_galaxyViewModel;
     ggh::GalaxyFactories::GalaxyGenerator* m_galaxyGenerator;
     ggh::Galaxy::Exporter::ExporterObject* m_exporterObject;
+    ggh::GalaxyFactories::XmlGalaxyImporter* m_xmlImporter;
     
     // System selection state
     quint32 m_selectedSystemId;

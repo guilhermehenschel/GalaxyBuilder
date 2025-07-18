@@ -16,6 +16,7 @@ add_executable(GalaxyFactoriesTests
     test_AbstractGalaxyFactory.cpp
     test_GalaxyGenerator_Full.cpp
     test_GalaxyParameterRespect.cpp
+    test_XmlGalaxyImporter.cpp
 )
 
 target_link_libraries(GalaxyFactoriesTests PRIVATE

@@ -20,15 +20,40 @@ ApplicationWindow {
     
     // MVVM ViewModel - ExporterObject is a singleton
     property ExporterObject viewModel: ExporterObject
+    
+    // Properties to receive context from parent
+    property var galaxyController: null
+    property int selectedCount: 0
+    
+    // Helper function to update selected count
+    function updateSelectedCount() {
+        var count = 0
+        for (var i = 0; i < systemsList.count; i++) {
+            var item = systemsList.itemAtIndex(i)
+            if (item && item.selected) {
+                count++
+            }
+        }
+        selectedCount = count
+    }
         
     Component.onCompleted: {
-        // Set data manager from global context
-        if (galaxyController && galaxyController.systemDataManager) {
-            setDataManager(galaxyController.systemDataManager)
+        // Get controller from GalaxyController singleton
+        galaxyController = GalaxyController
+        
+        // Set model for export - pass the GalaxyViewModel, not the controller
+        if (galaxyController && galaxyController.galaxyViewModel) {
+            viewModel.setModel(galaxyController.galaxyViewModel)
         }
-        // Initialize available systems
-        if (galaxyController && galaxyController.systemsModel) {
-            setSystemsModel(galaxyController.systemsModel)
+    }
+    
+    // Update the exporter model when galaxy changes
+    Connections {
+        target: galaxyController
+        function onGalaxyViewModelChanged() {
+            if (galaxyController && galaxyController.galaxyViewModel) {
+                viewModel.setModel(galaxyController.galaxyViewModel)
+            }
         }
     }
     
@@ -107,7 +132,7 @@ ApplicationWindow {
                     Item { Layout.fillWidth: true }
                     
                     Text {
-                        text: "Selected: " + viewModel.selectedCount + " systems"
+                        text: "Selected: " + selectedCount + " systems"
                         color: "#cccccc"
                     }
                 }
@@ -122,23 +147,23 @@ ApplicationWindow {
                         model: galaxyController ? galaxyController.systemsModel : null
                         
                         function selectAll() {
-                            viewModel.selectAllSystems()
                             for (var i = 0; i < count; i++) {
                                 var item = itemAtIndex(i)
                                 if (item) {
                                     item.selected = true
                                 }
                             }
+                            updateSelectedCount()
                         }
                         
                         function clearSelection() {
-                            viewModel.clearSelection()
                             for (var i = 0; i < count; i++) {
                                 var item = itemAtIndex(i)
                                 if (item) {
                                     item.selected = false
                                 }
                             }
+                            updateSelectedCount()
                         }
                         
                         delegate: Rectangle {
@@ -155,13 +180,8 @@ ApplicationWindow {
                                 anchors.fill: parent
                                 onClicked: {
                                     parent.selected = !parent.selected
-                                    
-                                    var system = model.starSystem
-                                    if (parent.selected) {
-                                        viewModel.selectSystem(system)
-                                    } else {
-                                        viewModel.deselectSystem(system)
-                                    }
+                                    // Update selected count
+                                    updateSelectedCount()
                                 }
                             }
                             
@@ -207,7 +227,10 @@ ApplicationWindow {
                                 
                                 CheckBox {
                                     checked: parent.parent.selected
-                                    onCheckedChanged: parent.parent.selected = checked
+                                    onCheckedChanged: {
+                                        parent.parent.selected = checked
+                                        updateSelectedCount()
+                                    }
                                 }
                             }
                         }
@@ -370,10 +393,10 @@ ApplicationWindow {
         folder: Platform.StandardPaths.writableLocation(Platform.StandardPaths.DocumentsLocation)
         
         onAccepted: {
-            if (viewModel.hasDataManager() && viewModel.selectedCount > 0) {
-                viewModel.exportSelectedSystems(file.toString())
+            if (selectedCount > 0) {
+                statusText.text = "Export selected systems not yet implemented. Please use 'Export All' for now."
             } else {
-                statusText.text = "Error: Cannot export - no systems selected or missing data manager"
+                statusText.text = "Error: No systems selected"
             }
         }
     }
@@ -387,10 +410,17 @@ ApplicationWindow {
         folder: Platform.StandardPaths.writableLocation(Platform.StandardPaths.DocumentsLocation)
         
         onAccepted: {
-            if (viewModel.hasDataManager()) {
-                viewModel.exportAllSystems(file.toString())
+            if (galaxyController && galaxyController.galaxyViewModel) {
+                // Convert file URL to file path
+                var filePath = file.toString().replace("file:///", "")
+                viewModel.setFilePath(filePath)
+                if (viewModel.exportObject()) {
+                    statusText.text = "Successfully exported all systems to " + filePath
+                } else {
+                    statusText.text = "Export failed: " + viewModel.errorString
+                }
             } else {
-                statusText.text = "Error: Cannot export - missing data manager"
+                statusText.text = "Error: Cannot export - no galaxy data available"
             }
         }
     }
@@ -403,10 +433,19 @@ ApplicationWindow {
         folder: Platform.StandardPaths.writableLocation(Platform.StandardPaths.DocumentsLocation)
         
         onAccepted: {
-            if (viewModel.hasDataManager()) {
-                viewModel.importGalaxy(file.toString())
+            if (galaxyController) {
+                // Convert file URL to file path
+                var filePath = file.toString().replace("file:///", "")
+                statusText.text = "Importing galaxy from " + filePath + "..."
+                
+                // Use the GalaxyController's import function
+                if (galaxyController.importGalaxy(filePath)) {
+                    statusText.text = "Successfully imported galaxy from " + filePath
+                } else {
+                    statusText.text = "Failed to import galaxy from " + filePath
+                }
             } else {
-                statusText.text = "Error: Cannot import - missing data manager"
+                statusText.text = "Error: Cannot import - missing galaxy controller"
             }
         }
     }
@@ -419,33 +458,41 @@ ApplicationWindow {
         folder: Platform.StandardPaths.writableLocation(Platform.StandardPaths.DocumentsLocation)
         
         onAccepted: {
-            if (viewModel.hasDataManager()) {
-                viewModel.importSystem(file.toString())
+            if (galaxyController) {
+                statusText.text = "System import functionality not yet implemented - please use 'Import Galaxy' for now"
             } else {
-                statusText.text = "Error: Cannot import - missing data manager"
+                statusText.text = "Error: Cannot import - missing galaxy controller"
             }
+        }
+    }
+    
+    // Connect to GalaxyController signals for import status updates
+    Connections {
+        target: galaxyController
+        function onImportStarted() {
+            statusText.text = "Importing galaxy..."
+        }
+        function onImportFinished(success, message) {
+            statusText.text = message
+        }
+        function onExportStarted() {
+            statusText.text = "Exporting galaxy..."
+        }
+        function onExportFinished(success, message) {
+            statusText.text = message
         }
     }
     
     // Connect to ViewModel signals for status updates
     Connections {
         target: viewModel
-        function onStatusMessageChanged() {
-            statusText.text = viewModel.statusMessage
-        }
-        function onExportCompleted(success, filePath, systemCount) {
-            if (success) {
-                statusText.text = "Successfully exported " + systemCount + " systems to " + filePath
-            } else {
-                statusText.text = "Export failed: " + filePath
+        function onErrorStringChanged() {
+            if (viewModel.errorString) {
+                statusText.text = "Error: " + viewModel.errorString
             }
         }
-        function onImportCompleted(success, filePath, systemCount) {
-            if (success) {
-                statusText.text = "Successfully imported " + systemCount + " systems from " + filePath
-            } else {
-                statusText.text = "Import failed: " + filePath
-            }
+        function onFilePathChanged() {
+            statusText.text = "File path changed to: " + viewModel.getFilePath()
         }
     }
     
