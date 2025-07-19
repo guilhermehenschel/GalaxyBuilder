@@ -22,12 +22,15 @@ public:
     enum PlanetRoles {
         NameRole = Qt::UserRole + 1,
         TypeRole,
+        TypeNameRole,
+        TypeColorRole,
         SizeRole,
         MassRole,
         MoonsRole,
         OrbitRole,
         MaxTempRole,
-        MinTempRole
+        MinTempRole,
+        ViewModelRole
     };
     Q_ENUM(PlanetRoles)
 
@@ -36,10 +39,11 @@ public:
     // QAbstractListModel interface
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+    bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex()) override;
     QHash<int, QByteArray> roleNames() const override;
 
     // Model mutation methods
-    void refresh();
+    Q_INVOKABLE void refresh();
 
 private:
     std::shared_ptr<models::StarSystemModel> m_starSystem;

@@ -24,15 +24,15 @@ namespace ggh::GalaxyCore::models
         m_name = name;
     }
 
-    void StarSystemModel::addPlanet(const Planet &planet)
+    void StarSystemModel::addPlanet(Planet&& planet)
     {
-        m_planets.push_back(planet);
+        m_planets.push_back(std::make_shared<Planet>(std::move(planet)));
     }
 
-    bool StarSystemModel::removePlanet(const Planet &planet)
+    bool StarSystemModel::removePlanet(std::shared_ptr<Planet> planet)
     {
         auto it = std::remove_if(m_planets.begin(), m_planets.end(),
-                                 [&planet](const Planet& p) { return p.name() == planet.name(); });
+                                 [&planet](std::shared_ptr<Planet> p) { return p->name() == planet->name(); });
         if (it != m_planets.end()) {
             m_planets.erase(it, m_planets.end());
             return true;
@@ -47,7 +47,7 @@ namespace ggh::GalaxyCore::models
                           m_id, m_name, m_position.x, m_position.y, static_cast<int>(m_starType), static_cast<int>(m_systemSize))};
         for (auto &planet : m_planets)
         {
-            xml += planet.toXml();
+            xml += planet->toXml();
         }
         xml += "</StarSystem>";
         return xml;
@@ -58,5 +58,5 @@ namespace ggh::GalaxyCore::models
     StarType StarSystemModel::getStarType() const noexcept { return m_starType; }
     SystemSize StarSystemModel::getSystemSize() const noexcept { return m_systemSize; }
     const std::string &StarSystemModel::getName() const noexcept { return m_name; }
-    const std::vector<Planet> &StarSystemModel::getPlanets() const noexcept { return m_planets; }
+    const std::vector<std::shared_ptr<Planet>> &StarSystemModel::getPlanets() const noexcept { return m_planets; }
 } // namespace ggh::GalaxyCore::models

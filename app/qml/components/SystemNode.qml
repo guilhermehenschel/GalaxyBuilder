@@ -1,8 +1,8 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
+import QtQuick
+import QtQuick.Controls
 import GalaxyBuilderApp 1.0
-import GalaxyCore.ViewModels 1.0
-import GalaxyCore.Model 1.0
+import GalaxyCore.ViewModels
+import GalaxyCore.Model
 
 Item {
     id: root

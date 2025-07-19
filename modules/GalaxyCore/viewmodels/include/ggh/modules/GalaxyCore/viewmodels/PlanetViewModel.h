@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QColor>
 #include <QtQml>
 #include <memory>
 #include "ggh/modules/GalaxyCore/models/PlanetModel.h"
@@ -21,6 +22,8 @@ class PlanetViewModel : public QObject {
     QML_ELEMENT
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(int planetType READ planetType WRITE setPlanetType NOTIFY planetTypeChanged)
+    Q_PROPERTY(QString typeName READ planetTypeString CONSTANT)
+    Q_PROPERTY(QColor typeColor READ planetTypeColor CONSTANT)
     Q_PROPERTY(double size READ size WRITE setSize NOTIFY sizeChanged)
     Q_PROPERTY(double mass READ mass WRITE setMass NOTIFY massChanged)
     Q_PROPERTY(int numberOfMoons READ numberOfMoons WRITE setNumberOfMoons NOTIFY numberOfMoonsChanged)
@@ -35,6 +38,8 @@ public:
     // Property getters
     QString name() const;
     int planetType() const;
+    QString planetTypeString() const;
+    QColor planetTypeColor() const;
     double size() const;
     double mass() const;
     int numberOfMoons() const;
@@ -58,7 +63,6 @@ public:
 
     // Utility methods
     Q_INVOKABLE QString toXml() const;
-    Q_INVOKABLE QString planetTypeString() const;
 
 signals:
     void nameChanged();
@@ -75,6 +79,8 @@ private:
     
     void connectToModel();
 };
+
+Q_DECLARE_METATYPE(ggh::GalaxyCore::viewmodels::PlanetViewModel*)
 
 } // namespace ggh::GalaxyCore::viewmodels
 

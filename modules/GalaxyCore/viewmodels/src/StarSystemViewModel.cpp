@@ -174,7 +174,7 @@ void StarSystemViewModel::addPlanet(const QString& name, int type, double size, 
 {
     auto planetType = static_cast<utilities::PlanetType>(type);
     models::Planet planet(name.toStdString(), planetType, size, mass, moons, radius, maxTemp, minTemp);
-    m_starSystem->addPlanet(planet);
+    m_starSystem->addPlanet(std::move(planet));
     m_planetsModel->refresh();
 }
 
@@ -182,9 +182,9 @@ bool StarSystemViewModel::removePlanetByName(const QString& name)
 {
     // Find planet by name and remove it
     const auto& planets = m_starSystem->getPlanets();
-    auto it = std::find_if(planets.begin(), planets.end(), 
-                          [&name](const models::Planet& planet) {
-                              return QString::fromStdString(planet.name()) == name;
+    auto it = std::find_if(planets.begin(), planets.end(),
+                          [&name](const std::shared_ptr<models::Planet>& planet) {
+                              return QString::fromStdString(planet->name()) == name;
                           });
     
     if (it != planets.end()) {

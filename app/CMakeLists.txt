@@ -39,6 +39,9 @@ qt_add_qml_module(GalaxyBuilderApp
         qml/Main.qml
         qml/components/ImportExportManager.qml
         qml/components/ParameterPanel.qml
+        qml/components/PlanetDetailsDialog.qml
+        qml/components/PlanetListView.qml
+        qml/components/StarSystemVisualizer.qml
         qml/components/SystemNode.qml
         qml/components/TravelLane.qml
         qml/components/PropertyPanel.qml

@@ -19,13 +19,13 @@ protected:
         ggh::GalaxyCore::utilities::CartesianCoordinates<double> pos1{100.0, 200.0};
         auto system1 = std::make_shared<GalaxyCore::models::StarSystemModel>(1, "Alpha", pos1);
         GalaxyCore::models::Planet planet1("Alpha I", GalaxyCore::models::PlanetType::Rocky, 1.0, 1.0, 0, 1.0, 100.0, -50.0);
-        system1->addPlanet(planet1);
+        system1->addPlanet(std::move(planet1));
         galaxyModel->addStarSystem(std::move(system1));
         
         ggh::GalaxyCore::utilities::CartesianCoordinates<double> pos2{300.0, 400.0};
         auto system2 = std::make_shared<GalaxyCore::models::StarSystemModel>(2, "Beta", pos2);
         GalaxyCore::models::Planet planet2("Beta I", GalaxyCore::models::PlanetType::GasGiant, 2.0, 5.0, 4, 2.0, 200.0, -100.0);
-        system2->addPlanet(planet2);
+        system2->addPlanet(std::move(planet2));
         galaxyModel->addStarSystem(std::move(system2));
         
         exporter = std::make_unique<GalaxyXMLExporter>(galaxyModel);

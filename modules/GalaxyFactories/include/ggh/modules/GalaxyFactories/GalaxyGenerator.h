@@ -3,6 +3,7 @@
 
 #include "ggh/modules/GalaxyCore/utilities/Common.h"
 #include "ggh/modules/GalaxyCore/models/GalaxyModel.h"
+#include "ggh/modules/GalaxyCore/models/PlanetModel.h"
 #include "ggh/modules/GalaxyFactories/AbstractGalaxyFactory.h"
 #include "ggh/modules/GalaxyFactories/Types.h"
 #include "galaxyfactories_global.h"
@@ -31,10 +32,18 @@ public:
     // Setters
     void setSeed(std::uint32_t seed);
 
+    // Generate planets for a star system based on its size
+    void generatePlanetsForSystem(std::shared_ptr<ggh::GalaxyCore::models::StarSystemModel> system) const;
+    
+    // Planet generation helpers
+    ggh::GalaxyCore::utilities::SystemSize generateRandomSystemSize() const;
+    ggh::GalaxyCore::utilities::PlanetType generateRandomPlanetType() const;
+    std::string generatePlanetName(int planetIndex, const std::string& systemName) const;
+
 private:
-    std::mt19937 m_rng;
-    std::uniform_real_distribution<double> m_realDist;
-    std::uniform_int_distribution<int> m_intDist;
+    mutable std::mt19937 m_rng;
+    mutable std::uniform_real_distribution<double> m_realDist;
+    mutable std::uniform_int_distribution<int> m_intDist;
     GenerationParameters m_params;
 
     // Generation methods for different galaxy shapes

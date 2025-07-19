@@ -11,11 +11,11 @@ protected:
         
         // Add some test planets
         ggh::GalaxyCore::models::Planet planet1("Planet A", ggh::GalaxyCore::models::PlanetType::Rocky, 1.0, 1.0, 0, 1.0, 100.0, -50.0);
-        starSystemModel->addPlanet(planet1);
+        starSystemModel->addPlanet(std::move(planet1));
 
         ggh::GalaxyCore::models::Planet planet2("Planet B", ggh::GalaxyCore::models::PlanetType::GasGiant, 2.0, 5.0, 4, 2.0, 200.0, -100.0);
-        starSystemModel->addPlanet(planet2);
-        
+        starSystemModel->addPlanet(std::move(planet2));
+
         exporter = std::make_unique<StarSystemXMLExporter>(starSystemModel);
     }
 

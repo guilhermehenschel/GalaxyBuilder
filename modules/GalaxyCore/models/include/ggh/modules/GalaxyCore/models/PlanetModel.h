@@ -46,14 +46,14 @@ public:
     }
 
 private:
-    std::string m_name;
-    PlanetType m_type;
-    double m_size;
-    double m_mass;
-    int m_numberOfMoons;
-    double m_orbitalRadius;
-    double m_maxTemperature;
-    double m_minTemperature;
+    std::string m_name{""};
+    PlanetType m_type{PlanetType::Rocky};
+    double m_size{0.0};
+    double m_mass{0.0};
+    int m_numberOfMoons{0};
+    double m_orbitalRadius{0.0};
+    double m_maxTemperature{0.0};
+    double m_minTemperature{0.0};
 };
 }
 

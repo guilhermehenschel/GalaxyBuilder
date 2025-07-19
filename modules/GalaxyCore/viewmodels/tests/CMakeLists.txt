@@ -22,6 +22,7 @@ add_executable(GalaxyCoreViewModelsTests
     test_starsystem_viewmodel.cpp
     test_galaxy_viewmodel.cpp
     test_travellane_viewmodel.cpp
+    test_commons.cpp
 )
 
 target_link_libraries(GalaxyCoreViewModelsTests PRIVATE

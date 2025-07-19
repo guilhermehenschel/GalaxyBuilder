@@ -23,7 +23,7 @@ public:
     StarType getStarType() const noexcept;
     SystemSize getSystemSize() const noexcept;
     const std::string& getName() const noexcept;
-    const std::vector<Planet>& getPlanets() const noexcept;
+    const std::vector<std::shared_ptr<GalaxyCore::models::Planet>>& getPlanets() const noexcept;
 
     std::string toXml() const;
 
@@ -34,8 +34,8 @@ public:
     void setName(const std::string& name);
 
     // Planet management
-    void addPlanet(const Planet& planet);
-    bool removePlanet(const Planet& planet);
+    void addPlanet(Planet&& planet);
+    bool removePlanet(std::shared_ptr<Planet> planet);
 
         /**
      * @brief Gets the XML tag name for the model.
@@ -51,7 +51,7 @@ private:
     StarType m_starType;  // Type of the star in the system
     SystemSize m_systemSize;  // Size category of the star system
     std::string m_name;  // Name of the star system
-    std::vector<Planet> m_planets;  // List of planets in the star system
+    std::vector<std::shared_ptr<Planet>> m_planets;  // List of planets in the star system
 };
 }
 

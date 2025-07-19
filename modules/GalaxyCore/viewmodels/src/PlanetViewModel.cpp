@@ -1,4 +1,5 @@
 #include "ggh/modules/GalaxyCore/viewmodels/PlanetViewModel.h"
+#include "ggh/modules/GalaxyCore/viewmodels/Commons.h"
 
 namespace ggh::GalaxyCore::viewmodels {
 
@@ -25,6 +26,16 @@ QString PlanetViewModel::name() const
 int PlanetViewModel::planetType() const
 {
     return static_cast<int>(m_planet->type());
+}
+
+QString PlanetViewModel::planetTypeString() const
+{
+    return commons::planetTypeName(m_planet->type());
+}
+
+QColor PlanetViewModel::planetTypeColor() const
+{
+    return commons::planetColor(m_planet->type());
 }
 
 double PlanetViewModel::size() const
@@ -151,21 +162,6 @@ void PlanetViewModel::setPlanet(std::shared_ptr<models::Planet> planet)
 QString PlanetViewModel::toXml() const
 {
     return QString::fromStdString(m_planet->toXml());
-}
-
-QString PlanetViewModel::planetTypeString() const
-{
-    switch (m_planet->type()) {
-        case PlanetType::Rocky: return "Rocky";
-        case PlanetType::GasGiant: return "Gas Giant";
-        case PlanetType::IceGiant: return "Ice Giant";
-        case PlanetType::Desert: return "Desert";
-        case PlanetType::Ocean: return "Ocean";
-        case PlanetType::Frozen: return "Frozen";
-        case PlanetType::Volcanic: return "Volcanic";
-        case PlanetType::Toxic: return "Toxic";
-        default: return "Unknown";
-    }
 }
 
 void PlanetViewModel::connectToModel()

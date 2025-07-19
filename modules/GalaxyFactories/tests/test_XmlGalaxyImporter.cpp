@@ -187,8 +187,8 @@ TEST_F(XmlGalaxyImporterTest, ImportSystemsWithPlanets) {
     EXPECT_EQ(system->getPlanets().size(), 2);
     
     auto planets = system->getPlanets();
-    EXPECT_EQ(planets[0].name(), "TestPlanet1");
-    EXPECT_EQ(planets[1].name(), "TestPlanet2");
+    EXPECT_EQ(planets[0]->name(), "TestPlanet1");
+    EXPECT_EQ(planets[1]->name(), "TestPlanet2");
 }
 
 TEST_F(XmlGalaxyImporterTest, ImportTravelLanesWithInvalidSystems) {

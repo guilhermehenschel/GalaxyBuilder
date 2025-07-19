@@ -19,24 +19,24 @@ TEST(StarSystemModelTest, AddPlanet) {
     StarSystemModel system(2, "Planetary System", {300.0, 400.0}, StarType::BlueStar);
     Planet planet("Test Planet", PlanetType::GasGiant, 1.0, 5.972e24, 2, 1.496e11, 288.0, 255.0);
     
-    system.addPlanet(planet);
-    
+    system.addPlanet(std::move(planet));
+
     EXPECT_EQ(system.getPlanets().size(), 1);
-    EXPECT_EQ(system.getPlanets()[0].name(), "Test Planet");
-    EXPECT_EQ(system.getPlanets()[0].type(), PlanetType::GasGiant);
-    EXPECT_DOUBLE_EQ(system.getPlanets()[0].size(), 1.0);
-    EXPECT_DOUBLE_EQ(system.getPlanets()[0].mass(), 5.972e24);
-    EXPECT_EQ(system.getPlanets()[0].numberOfMoons(), 2);
-    EXPECT_DOUBLE_EQ(system.getPlanets()[0].orbitalRadius(), 1.496e11);
-    EXPECT_DOUBLE_EQ(system.getPlanets()[0].maxTemperature(), 288.0);
-    EXPECT_DOUBLE_EQ(system.getPlanets()[0].minTemperature(), 255.0);
+    EXPECT_EQ(system.getPlanets()[0]->name(), "Test Planet");
+    EXPECT_EQ(system.getPlanets()[0]->type(), PlanetType::GasGiant);
+    EXPECT_DOUBLE_EQ(system.getPlanets()[0]->size(), 1.0);
+    EXPECT_DOUBLE_EQ(system.getPlanets()[0]->mass(), 5.972e24);
+    EXPECT_EQ(system.getPlanets()[0]->numberOfMoons(), 2);
+    EXPECT_DOUBLE_EQ(system.getPlanets()[0]->orbitalRadius(), 1.496e11);
+    EXPECT_DOUBLE_EQ(system.getPlanets()[0]->maxTemperature(), 288.0);
+    EXPECT_DOUBLE_EQ(system.getPlanets()[0]->minTemperature(), 255.0);
 }
 
 TEST(StarSystemModelTest, ToXml) {
     StarSystemModel system(3, "XML System", {500.0, 600.0}, StarType::WhiteDwarf);
     Planet planet("XML Planet", PlanetType::Rocky, 0.5, 5.972e24, 1, 1.496e11, 288.0, 255.0);
     
-    system.addPlanet(planet);
+    system.addPlanet(std::move(planet));
     
     std::string xml = system.toXml();
     
@@ -64,7 +64,7 @@ TEST(StarSystemModelTest, PlanetXmlConversion) {
     StarSystemModel system(5, "Planet XML System", {1100.0, 1200.0}, StarType::Neutron);
     Planet planet("XML Test Planet", PlanetType::IceGiant, 2.0, 1.898e27, 79, 778.5e9, 130.0, 90.0);
     
-    system.addPlanet(planet);
+    system.addPlanet(std::move(planet));
     
     std::string xml = system.toXml();
     

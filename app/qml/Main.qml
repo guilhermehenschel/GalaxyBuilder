@@ -1,12 +1,12 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
 import QtQuick.Dialogs
 import GalaxyBuilderApp 1.0
-import GalaxyCore.ViewModels 1.0
-import GalaxyCore.Model 1.0
-import Galaxy.Factories 1.0
-import Galaxy.Exporters 1.0
+import GalaxyCore.ViewModels
+import GalaxyCore.Model
+import Galaxy.Factories
+import Galaxy.Exporters
 import "components"
 
 ApplicationWindow {

@@ -119,7 +119,7 @@ protected:
         ggh::GalaxyCore::utilities::CartesianCoordinates<double> pos{750.0, 850.0};
         auto system = std::make_shared<StarSystemModel>(1, "Integration System", pos);
         Planet planet("Integration Planet", PlanetType::Rocky, 1.0, 1.0, 0, 1.0, 100.0, -50.0);
-        system->addPlanet(planet);
+        system->addPlanet(std::move(planet));
         galaxyModel->addStarSystem(std::move(system));
         
         galaxyViewModel = std::make_unique<GalaxyViewModel>(galaxyModel);

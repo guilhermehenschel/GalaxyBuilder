@@ -113,7 +113,10 @@ ApplicationWindow {
                             from: 1
                             to: 10000
                             stepSize: 1
-                            value: starSystemViewModel ? Math.round(starSystemViewModel.starMass * 100) : 100
+                            value: 100  // Default value since starMass doesn't exist in model
+                            enabled: false  // Disabled since property doesn't exist
+
+                            visible: false  // Hide since we don't have starMass in the model
                             
                             background: Rectangle {
                                 color: "#404040"
@@ -126,16 +129,12 @@ ApplicationWindow {
                                 color: "#ffffff"
                                 horizontalAlignment: Qt.AlignHCenter
                                 verticalAlignment: Qt.AlignVCenter
-                                readOnly: !parent.editable
+                                readOnly: true
                                 validator: DoubleValidator {
                                     bottom: 0.01
                                     top: 100.00
                                     decimals: 2
                                 }
-                            }
-                            
-                            onValueModified: {
-                                if (starSystemViewModel) starSystemViewModel.starMass = value / 100.0
                             }
                         }
                         
@@ -149,7 +148,10 @@ ApplicationWindow {
                             from: 1000
                             to: 100000
                             stepSize: 100
-                            value: starSystemViewModel ? starSystemViewModel.starTemperature : 5778
+                            value: 5778  // Default value since starTemperature doesn't exist in model
+                            enabled: false  // Disabled since property doesn't exist
+
+                            visible: false  // Hide since we don't have starTemperature in the model
 
                             background: Rectangle {
                                 color: "#404040"
@@ -162,11 +164,7 @@ ApplicationWindow {
                                 color: "#ffffff"
                                 horizontalAlignment: Qt.AlignHCenter
                                 verticalAlignment: Qt.AlignVCenter
-                                readOnly: !parent.editable
-                            }
-                            
-                            onValueModified: {
-                                if (starSystemViewModel) starSystemViewModel.starTemperature = value
+                                readOnly: true
                             }
                         }
                         
@@ -180,7 +178,10 @@ ApplicationWindow {
                             from: 1
                             to: 100000
                             stepSize: 1
-                            value: starSystemViewModel ? Math.round(starSystemViewModel.starLuminosity * 1000) : 1000
+                            value: 1000  // Default value since starLuminosity doesn't exist in model
+                            enabled: false  // Disabled since property doesn't exist
+
+                            visible: false  // Hide since we don't have starLuminosity in the model
 
                             background: Rectangle {
                                 color: "#404040"
@@ -193,16 +194,12 @@ ApplicationWindow {
                                 color: "#ffffff"
                                 horizontalAlignment: Qt.AlignHCenter
                                 verticalAlignment: Qt.AlignVCenter
-                                readOnly: !parent.editable
+                                readOnly: true
                                 validator: DoubleValidator {
                                     bottom: 0.001
                                     top: 100.000
                                     decimals: 3
                                 }
-                            }
-                            
-                            onValueModified: {
-                                if (starSystemViewModel) starSystemViewModel.starLuminosity = value / 1000.0
                             }
                         }
                     }
@@ -230,79 +227,13 @@ ApplicationWindow {
                         anchors.fill: parent
                         color: "#0a0a0a"
                         radius: 3
-                        
-                        // Star at center
-                        Rectangle {
-                            id: starViz
-                            width: 20
-                            height: 20
-                            radius: 10
-                            anchors.centerIn: parent
-                            color: (starSystemViewModel && starSystemViewModel.starSystem) ? starSystemViewModel.starSystem.color : "#ffff80"
-                            border.color: "#ffffff"
-                            border.width: 1
-                            
-                            // Star glow effect
-                            Rectangle {
-                                anchors.centerIn: parent
-                                width: parent.width + 10
-                                height: parent.height + 10
-                                radius: (parent.width + 10) / 2
-                                color: parent.color
-                                opacity: 0.3
-                            }
-                        }
-                        
-                        // Planet orbits and planets
-                        Repeater {
-                            model: starSystemViewModel ? starSystemViewModel.planetsModel : null
 
-                            Item {
-                                anchors.centerIn: parent
-                                
-                                // Orbit circle
-                                Rectangle {
-                                    id: orbit
-                                    width: model.orbitDistance * 2
-                                    height: model.orbitDistance * 2
-                                    radius: model.orbitDistance
-                                    anchors.centerIn: parent
-                                    color: "transparent"
-                                    border.color: "#404040"
-                                    border.width: 1
-                                    opacity: 0.5
-                                }
-                                
-                                // Planet
-                                Rectangle {
-                                    id: planet
-                                    width: 8 + model.size * 2
-                                    height: 8 + model.size * 2
-                                    radius: (8 + model.size * 2) / 2
-                                    color: getPlanetColor(model.type)
-                                    border.color: "#ffffff"
-                                    border.width: 1
-                                    x: parent.width/2 + model.orbitDistance - width/2
-                                    y: parent.height/2 - height/2
-                                    
-                                    ToolTip {
-                                        visible: planetMouseArea.containsMouse
-                                        text: model.name + "\nType: " + getPlanetTypeName(model.type) + 
-                                              "\nMoons: " + model.moons + 
-                                              "\nMass: " + model.mass.toFixed(2) + " Earth masses"
-                                        delay: 500
-                                    }
-                                    
-                                    MouseArea {
-                                        id: planetMouseArea
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        onClicked: {
-                                            planetListView.currentIndex = index
-                                        }
-                                    }
-                                }
-                            }
+                        // Planet orbits and planets
+                        StarSystemVisualizer {
+                            model: starSystemViewModel ? starSystemViewModel.planets : null
+                            starModel: starSystemViewModel
+
+                            anchors.fill: parent
                         }
                     }
                 }
@@ -344,8 +275,37 @@ ApplicationWindow {
                                     verticalAlignment: Text.AlignVCenter
                                 }
                                 onClicked: {
-                                    if (starSystemViewModel) {
-                                        starSystemViewModel.addNewPlanet()
+                                    planetDetailsDialog.isNewPlanet = true
+                                    planetDetailsDialog.planetViewModel = null
+                                    planetDetailsDialog.open()
+                                }
+                            }
+                            
+                            Button {
+                                text: "Edit Selected"
+                                enabled: planetListView.currentIndex >= 0
+                                background: Rectangle {
+                                    color: enabled ? "#0066cc" : "#444444"
+                                    border.color: enabled ? "#0088ff" : "#666666"
+                                    radius: 3
+                                }
+                                contentItem: Text {
+                                    text: parent.text
+                                    color: enabled ? "#ffffff" : "#999999"
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                onClicked: {
+                                    if (starSystemViewModel && planetListView.currentIndex >= 0) {
+                                        // Get the planet data from the model using the proper QML model access
+                                        var planetModel = starSystemViewModel.planets
+                                        if (planetModel && planetListView.currentIndex < planetModel.rowCount()) {
+                                            var index = planetModel.index(planetListView.currentIndex, 0)
+                                            var planetName = planetModel.data(index, planetModel.NameRole)
+                                            if (planetName) {
+                                                editPlanetByName(planetName)
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -366,7 +326,15 @@ ApplicationWindow {
                                 }
                                 onClicked: {
                                     if (starSystemViewModel && planetListView.currentIndex >= 0) {
-                                        starSystemViewModel.removePlanet(planetListView.currentIndex)
+                                        // Get the planet data from the model using the proper QML model access
+                                        var planetModel = starSystemViewModel.planets
+                                        if (planetModel && planetListView.currentIndex < planetModel.rowCount()) {
+                                            var index = planetModel.index(planetListView.currentIndex, 0)
+                                            var planetName = planetModel.data(index, planetModel.NameRole)
+                                            if (planetName) {
+                                                starSystemViewModel.removePlanetByName(planetName)
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -374,65 +342,87 @@ ApplicationWindow {
                             Item { Layout.fillWidth: true }
                         }
                         
-                        ListView {
-                            id: planetListView
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: Math.max(100, contentHeight)
-                            Layout.maximumHeight: 400
-                            clip: true
-                            model: starSystemViewModel ? starSystemViewModel.planetsModel : null
-                            
-                            delegate: Rectangle {
-                                width: planetListView.width
-                                height: 60
-                                color: ListView.isCurrentItem ? "#404040" : "#2a2a2a"
-                                border.color: "#606060"
-                                radius: 3
-                                
-                                RowLayout {
-                                    anchors.fill: parent
-                                    anchors.margins: 10
-                                    spacing: 10
-                                    
-                                    Rectangle {
-                                        width: 20
-                                        height: 20
-                                        radius: 10
-                                        color: getPlanetColor(model.type)
-                                        border.color: "#ffffff"
-                                        border.width: 1
-                                    }
-                                    
-                                    ColumnLayout {
-                                        Layout.fillWidth: true
-                                        spacing: 2
-                                        
-                                        Text {
-                                            text: model.name
-                                            color: "#ffffff"
-                                            font.bold: true
-                                        }
-                                        
-                                        Text {
-                                            text: "Type: " + getPlanetTypeName(model.type) + ", Moons: " + model.moons
-                                            color: "#cccccc"
-                                            font.pixelSize: 12
-                                        }
-                                    }
-                                    
-                                    Text {
-                                        text: model.mass.toFixed(2) + " ME"
-                                        color: "#cccccc"
-                                        font.pixelSize: 12
-                                    }
-                                }
-                                
-                                MouseArea {
-                                    anchors.fill: parent
-                                    onClicked: planetListView.currentIndex = index
-                                }
-                            }
+                        PlanetListView {
+                                id: planetListView
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: Math.max(100, contentHeight)
+                                Layout.maximumHeight: 400
+                                clip: true
+                                model: starSystemViewModel ? starSystemViewModel.planets : null
                         }
+                        // ListView {
+                        //     
+                        //     Layout.fillWidth: true
+                        //     Layout.preferredHeight: Math.max(100, contentHeight)
+                        //     Layout.maximumHeight: 400
+                        //     clip: true
+                        //     model: starSystemViewModel ? starSystemViewModel.planets : null
+                            
+                        //     delegate: Rectangle {
+                        //         width: planetListView.width
+                        //         height: 60
+                        //         color: ListView.isCurrentItem ? "#404040" : "#2a2a2a"
+                        //         border.color: "#606060"
+                        //         radius: 3
+                                
+                        //         RowLayout {
+                        //             anchors.fill: parent
+                        //             anchors.margins: 10
+                        //             spacing: 10
+                                    
+                        //             Rectangle {
+                        //                 width: 20
+                        //                 height: 20
+                        //                 radius: 10
+                        //                 color: getPlanetColor(model.type)
+                        //                 border.color: "#ffffff"
+                        //                 border.width: 1
+                        //             }
+                                    
+                        //             ColumnLayout {
+                        //                 Layout.fillWidth: true
+                        //                 spacing: 2
+                                        
+                        //                 Text {
+                        //                     text: model.name
+                        //                     color: "#ffffff"
+                        //                     font.bold: true
+                        //                 }
+                                        
+                        //                 Text {
+                        //                     text: "Type: " + getPlanetTypeName(model.type) + ", Moons: " + model.moons
+                        //                     color: "#cccccc"
+                        //                     font.pixelSize: 12
+                        //                 }
+                        //             }
+                                    
+                        //             Text {
+                        //                 text: model.mass.toFixed(2) + " ME"
+                        //                 color: "#cccccc"
+                        //                 font.pixelSize: 12
+                        //             }
+                        //         }
+                                
+                        //         MouseArea {
+                        //             anchors.fill: parent
+                        //             onClicked: planetListView.currentIndex = index
+                        //             onDoubleClicked: {
+                        //                 // Set the current index and use the same logic as the Edit button
+                        //                 planetListView.currentIndex = index
+                        //                 if (starSystemViewModel) {
+                        //                     var planetModel = starSystemViewModel.planets
+                        //                     if (planetModel && index < planetModel.rowCount()) {
+                        //                         var modelIndex = planetModel.index(index, 0)
+                        //                         var planetName = planetModel.data(modelIndex, planetModel.NameRole)
+                        //                         if (planetName) {
+                        //                             editPlanetByName(planetName)
+                        //                         }
+                        //                     }
+                        //                 }
+                        //             }
+                        //         }
+                        //     }
+                        // }
                     }
                 }
             }
@@ -485,7 +475,7 @@ ApplicationWindow {
     Text {
         id: statusLabel
         visible: text !== ""
-        text: starSystemViewModel ? starSystemViewModel.statusMessage : ""
+        text: ""  // No status message property available in ViewModel
         color: "#ffff00"
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
@@ -495,9 +485,7 @@ ApplicationWindow {
             id: statusTimer
             interval: 3000
             onTriggered: {
-                if (starSystemViewModel) {
-                    starSystemViewModel.clearStatusMessage()
-                }
+                statusLabel.text = ""
             }
         }
         
@@ -516,55 +504,87 @@ ApplicationWindow {
     
     // Helper functions
     function saveSystemData() {
-        if (starSystemViewModel) {
-            return starSystemViewModel.saveSystemData()
-        }
-        return false
+        // Data is automatically saved when properties are modified
+        // No additional saving required
+        return true
     }
     
     function loadSystemData() {
-        if (starSystemViewModel) {
-            return starSystemViewModel.loadSystemData()
-        }
-        return false
+        // Data is automatically loaded when starSystemViewModel is set
+        // No additional loading required
+        return true
     }
     
     function refreshUI() {
         // Force UI refresh by updating bound properties
-        if (starSystemViewModel && starSystemViewModel.starSystem) {
-            nameField.text = starSystemViewModel.starSystem.name
-            starTypeCombo.currentIndex = starSystemViewModel.starSystem.starType
-            massSpinBox.value = Math.round(starSystemViewModel.starSystem.starMass * 100)
-            temperatureSpinBox.value = starSystemViewModel.starSystem.starTemperature
-            luminositySpinBox.value = Math.round(starSystemViewModel.starSystem.starLuminosity * 1000)
+        if (starSystemViewModel) {
+            nameField.text = starSystemViewModel.name
+            starTypeCombo.currentIndex = starSystemViewModel.starType
+            // Note: mass, temperature, and luminosity are disabled as they don't exist in the model
         }
     }
     
     // Auto-setup when starSystemViewModel changes
-    Connections {
-        target: starSystemViewModel
-        function onStarSystemChanged() {
-            if (starSystemViewModel && starSystemViewModel.starSystem) {
-                loadSystemData()
+    onStarSystemViewModelChanged: {
+        if (starSystemViewModel) {
+            loadSystemData()
+        }
+    }
+    
+    function editPlanetByName(planetName) {
+        console.log("Editing planet:", planetName)
+        if (starSystemViewModel) {
+            // Find the planet in the model
+            var planetModel = starSystemViewModel.planets
+            if (planetModel) {
+                for (var i = 0; i < planetModel.rowCount(); i++) {
+                    var index = planetModel.index(i, 0)
+                    var name = planetModel.data(index, planetModel.NameRole)
+                    if (name === planetName) {
+                        // Set up the dialog with the planet's current data
+                        var planetType = planetModel.data(index, planetModel.TypeRole)
+                        var size = planetModel.data(index, planetModel.SizeRole)
+                        var mass = planetModel.data(index, planetModel.MassRole)
+                        var moons = planetModel.data(index, planetModel.MoonsRole)
+                        var orbitalRadius = planetModel.data(index, planetModel.OrbitRole)
+                        var maxTemp = planetModel.data(index, planetModel.MaxTempRole)
+                        var minTemp = planetModel.data(index, planetModel.MinTempRole)
+                        
+                        // Set the dialog for editing mode
+                        planetDetailsDialog.editMode = true
+                        planetDetailsDialog.originalPlanetName = planetName
+                        planetDetailsDialog.setupForEditing(name, planetType, size, mass, moons, orbitalRadius, maxTemp, minTemp)
+                        planetDetailsDialog.open()
+                        return
+                    }
+                }
             }
         }
+        statusLabel.text = "Could not find planet '" + planetName + "' for editing"
     }
     
-    function getPlanetColor(type) {
-        switch(type) {
-            case 0: return "#8B4513"  // Terrestrial - Brown
-            case 1: return "#FFA500"  // Gas Giant - Orange
-            case 2: return "#87CEEB"  // Ice Giant - Light Blue
-            case 3: return "#F4A460"  // Desert - Sandy Brown
-            case 4: return "#0077BE"  // Ocean - Ocean Blue
-            case 5: return "#FF4500"  // Volcanic - Red Orange
-            case 6: return "#E0E0E0"  // Frozen - Light Gray
-            default: return "#808080" // Default - Gray
+    // Planet Details Dialog
+    PlanetDetailsDialog {
+        id: planetDetailsDialog
+        
+        onPlanetCreated: function(name, type, size, mass, moons, radius, maxTemp, minTemp) {
+            if (starSystemViewModel) {
+                starSystemViewModel.addPlanet(name, type, size, mass, moons, radius, maxTemp, minTemp)
+                statusLabel.text = "Planet '" + name + "' added successfully"
+            }
         }
-    }
-    
-    function getPlanetTypeName(type) {
-        const types = ["Terrestrial", "Gas Giant", "Ice Giant", "Desert", "Ocean", "Volcanic", "Frozen"]
-        return types[type] || "Unknown"
+        
+        onPlanetEdited: function(originalName, name, type, size, mass, moons, radius, maxTemp, minTemp) {
+            if (starSystemViewModel) {
+                // Remove the old planet and add the updated one
+                starSystemViewModel.removePlanetByName(originalName)
+                starSystemViewModel.addPlanet(name, type, size, mass, moons, radius, maxTemp, minTemp)
+                statusLabel.text = "Planet '" + name + "' updated successfully"
+            }
+        }
+        
+        onPlanetUpdated: {
+            statusLabel.text = "Planet updated successfully"
+        }
     }
 }

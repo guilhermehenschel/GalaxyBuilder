@@ -1,8 +1,8 @@
-import QtQuick 2.15
+import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import GalaxyBuilderApp 1.0
-import GalaxyCore.ViewModels 1.0
+import GalaxyCore.ViewModels
 
 Rectangle {
     required property PlanetViewModel planet

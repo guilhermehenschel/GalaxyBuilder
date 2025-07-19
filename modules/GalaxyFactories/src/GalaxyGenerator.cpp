@@ -2,10 +2,14 @@
 #include <cmath>
 #include <algorithm>
 #include <chrono>
+#include <vector>
+
+#include "ggh/modules/GalaxyCore/models/PlanetModel.h"
 
 using namespace ggh::GalaxyFactories;
 using GalaxyModel = ggh::GalaxyCore::models::GalaxyModel;
 using StarSystemModel = ggh::GalaxyCore::models::StarSystemModel;
+using PlanetModel = ggh::GalaxyCore::models::Planet;
 using CartesianCoordinates = ggh::GalaxyCore::utilities::CartesianCoordinates<double>;
 
 namespace ggh::GalaxyFactories {
@@ -111,7 +115,10 @@ void GalaxyGenerator::generateSpiralGalaxy(GalaxyModel& galaxy, const Generation
             if (pos.x >= 0 && pos.x < params.width && pos.y >= 0 && pos.y < params.height) {
                 if (isValidSystemPosition(galaxy, pos) || attempts > static_cast<int>(params.systemCount) * 3) {
                     std::string systemName = "System_" + std::to_string(systemId);
-                    galaxy.addStarSystem(systemId++, systemName, pos, generateRandomStarType());
+                    auto system = std::make_shared<StarSystemModel>(systemId++, systemName, pos, generateRandomStarType());
+                    system->setSystemSize(generateRandomSystemSize());
+                    generatePlanetsForSystem(system);
+                    galaxy.addStarSystem(std::move(system));
                     systemsGenerated++;
                 } else {
                     systemInArm--; // Try this position again
@@ -148,7 +155,10 @@ void GalaxyGenerator::generateEllipticalGalaxy(GalaxyModel& galaxy, const Genera
         if (pos.x >= 0 && pos.x < params.width && pos.y >= 0 && pos.y < params.height) {
             if (isValidSystemPosition(galaxy, pos) || attempts > static_cast<int>(params.systemCount) * 5) {
                 std::string systemName = "System_" + std::to_string(systemId);
-                galaxy.addStarSystem(systemId++, systemName, pos, generateRandomStarType());
+                auto system = std::make_shared<StarSystemModel>(systemId++, systemName, pos, generateRandomStarType());
+                system->setSystemSize(generateRandomSystemSize());
+                generatePlanetsForSystem(system);
+                galaxy.addStarSystem(std::move(system));
                 systemsGenerated++;
             }
         }
@@ -180,7 +190,10 @@ void GalaxyGenerator::generateRingGalaxy(GalaxyModel& galaxy, const GenerationPa
         if (pos.x >= 0 && pos.x < params.width && pos.y >= 0 && pos.y < params.height) {
             if (isValidSystemPosition(galaxy, pos) || attempts > static_cast<int>(params.systemCount) * 5) {
                 std::string systemName = "System_" + std::to_string(systemId);
-                galaxy.addStarSystem(systemId++, systemName, pos, generateRandomStarType());
+                auto system = std::make_shared<StarSystemModel>(systemId++, systemName, pos, generateRandomStarType());
+                system->setSystemSize(generateRandomSystemSize());
+                generatePlanetsForSystem(system);
+                galaxy.addStarSystem(std::move(system));
                 systemsGenerated++;
             }
         }
@@ -217,7 +230,10 @@ void GalaxyGenerator::generateClusterGalaxy(GalaxyModel& galaxy, const Generatio
                 pos.y >= 0 && pos.y < params.height) {
                 if (isValidSystemPosition(galaxy, pos) || attempts > systemsInThisCluster * 5) {
                     std::string systemName = "System_" + std::to_string(systemId);
-                    galaxy.addStarSystem(systemId++, systemName, pos, generateRandomStarType());
+                    auto system = std::make_shared<StarSystemModel>(systemId++, systemName, pos, generateRandomStarType());
+                    system->setSystemSize(generateRandomSystemSize());
+                    generatePlanetsForSystem(system);
+                    galaxy.addStarSystem(std::move(system));
                     systemsGenerated++;
                     totalSystemsGenerated++;
                 }
@@ -297,6 +313,134 @@ void GalaxyGenerator::connectNearestSystems(GalaxyModel& galaxy, const Generatio
         for (int k = 0; k < connectionsToMake; ++k) {
             galaxy.addTravelLane(laneId++, systems[i]->getId(), systems[distances[k].second]->getId());
         }
+    }
+}
+
+ggh::GalaxyCore::utilities::SystemSize GalaxyGenerator::generateRandomSystemSize() const {
+    int rand = m_intDist(m_rng);
+    
+    if (rand < 40) return ggh::GalaxyCore::utilities::SystemSize::Small;      // 40%
+    else if (rand < 75) return ggh::GalaxyCore::utilities::SystemSize::Medium;   // 35%
+    else if (rand < 95) return ggh::GalaxyCore::utilities::SystemSize::Large;    // 20%
+    else return ggh::GalaxyCore::utilities::SystemSize::Huge;                    // 5%
+}
+
+ggh::GalaxyCore::utilities::PlanetType GalaxyGenerator::generateRandomPlanetType() const {
+    int rand = m_intDist(m_rng);
+    
+    if (rand < 35) return ggh::GalaxyCore::utilities::PlanetType::Rocky;        // 35%
+    else if (rand < 50) return ggh::GalaxyCore::utilities::PlanetType::Desert;   // 15%
+    else if (rand < 65) return ggh::GalaxyCore::utilities::PlanetType::Ocean;    // 15%
+    else if (rand < 75) return ggh::GalaxyCore::utilities::PlanetType::Frozen;   // 10%
+    else if (rand < 85) return ggh::GalaxyCore::utilities::PlanetType::GasGiant; // 10%
+    else if (rand < 92) return ggh::GalaxyCore::utilities::PlanetType::IceGiant; // 7%
+    else if (rand < 97) return ggh::GalaxyCore::utilities::PlanetType::Volcanic; // 5%
+    else return ggh::GalaxyCore::utilities::PlanetType::Toxic;                   // 3%
+}
+
+std::string GalaxyGenerator::generatePlanetName(int planetIndex, const std::string& systemName) const {
+    // Generate Roman numeral suffixes for planets
+    const std::vector<std::string> romanNumerals = {"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"};
+    
+    if (planetIndex < romanNumerals.size()) {
+        return systemName + " " + romanNumerals[planetIndex];
+    }
+    return systemName + " " + std::to_string(planetIndex + 1);
+}
+
+void GalaxyGenerator::generatePlanetsForSystem(std::shared_ptr<ggh::GalaxyCore::models::StarSystemModel> system) const {
+    using SystemSize = ggh::GalaxyCore::utilities::SystemSize;
+    
+    // Determine number of planets based on system size
+    int basePlanetCount = 0;
+    int maxVariation = 0;
+    
+    switch (system->getSystemSize()) {
+        case SystemSize::Small:
+            basePlanetCount = 1;
+            maxVariation = 2; // 1-3 planets
+            break;
+        case SystemSize::Medium:
+            basePlanetCount = 3;
+            maxVariation = 3; // 3-6 planets
+            break;
+        case SystemSize::Large:
+            basePlanetCount = 5;
+            maxVariation = 4; // 5-9 planets
+            break;
+        case SystemSize::Huge:
+            basePlanetCount = 7;
+            maxVariation = 5; // 7-12 planets
+            break;
+    }
+    
+    int planetCount = basePlanetCount + (m_intDist(m_rng) % (maxVariation + 1));
+    
+    for (int i = 0; i < planetCount; ++i) {
+        std::string planetName = generatePlanetName(i, system->getName());
+        auto planetType = generateRandomPlanetType();
+        
+        // Generate planet properties based on type and orbital position
+        double orbitalRadius = 0.3 + (i * 0.7) + (m_realDist(m_rng) * 0.5); // AU
+        double size = 0.3 + m_realDist(m_rng) * 2.0; // Earth sizes
+        double mass = size * size * (0.8 + m_realDist(m_rng) * 0.4); // Rough mass correlation
+        
+        // Adjust properties based on planet type
+        switch (planetType) {
+            case ggh::GalaxyCore::utilities::PlanetType::GasGiant:
+                size *= 3.0 + m_realDist(m_rng) * 2.0; // Much larger
+                mass *= 10.0 + m_realDist(m_rng) * 50.0; // Much more massive
+                break;
+            case ggh::GalaxyCore::utilities::PlanetType::IceGiant:
+                size *= 2.0 + m_realDist(m_rng) * 1.5;
+                mass *= 5.0 + m_realDist(m_rng) * 10.0;
+                break;
+            default:
+                // Rocky planets and others keep base size/mass
+                break;
+        }
+        
+        // Generate number of moons (more for larger planets)
+        int moons = 0;
+        if (size > 1.5) {
+            moons = static_cast<int>(size * (1 + m_realDist(m_rng)));
+        } else if (size > 0.8) {
+            moons = m_intDist(m_rng) % 3; // 0-2 moons
+        }
+        
+        // Generate temperatures based on orbital distance
+        double baseTemp = 300.0 / std::sqrt(orbitalRadius); // Simple inverse square approximation
+        double tempVariation = 20.0 + m_realDist(m_rng) * 40.0;
+        double maxTemp = baseTemp + tempVariation;
+        double minTemp = baseTemp - tempVariation;
+        
+        // Adjust for planet type
+        switch (planetType) {
+            case ggh::GalaxyCore::utilities::PlanetType::Volcanic:
+                maxTemp += 100.0;
+                minTemp += 50.0;
+                break;
+            case ggh::GalaxyCore::utilities::PlanetType::Frozen:
+                maxTemp = std::min(maxTemp, 200.0);
+                minTemp = std::min(minTemp, 150.0);
+                break;
+            case ggh::GalaxyCore::utilities::PlanetType::Desert:
+                maxTemp += 50.0;
+                minTemp -= 30.0;
+                break;
+            case ggh::GalaxyCore::utilities::PlanetType::Ocean:
+                // More stable temperatures
+                tempVariation *= 0.5;
+                maxTemp = baseTemp + tempVariation;
+                minTemp = baseTemp - tempVariation;
+                break;
+            default:
+                break;
+        }
+        
+        // Create and add the planet
+        PlanetModel planet(planetName, planetType, size, mass, moons, orbitalRadius, maxTemp, minTemp);
+        system->addPlanet(std::move(planet));
     }
 }
 }

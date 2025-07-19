@@ -211,7 +211,7 @@ bool XmlGalaxyImporter::parsePlanetFromStream(std::shared_ptr<StarSystemModel> s
     }
 
     Planet planet(name, type, size, mass, numberOfMoons, orbitalRadius, maxTemperature, minTemperature);
-    system->addPlanet(planet);
+    system->addPlanet(std::move(planet));
     
     xml.skipCurrentElement(); // Skip to end of Planet element
     return true;
