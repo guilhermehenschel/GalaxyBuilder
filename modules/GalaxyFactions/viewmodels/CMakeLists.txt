@@ -38,12 +38,18 @@ set(VIEWMODELS_SOURCES
     src/GalaxyFactionsViewModel.cpp
 )
 
-# Create the QML module
-qt_add_qml_module(GalaxyFactionsViewModels
-    URI GalaxyFactions.ViewModels
-    VERSION 1.0
-    SOURCES ${VIEWMODELS_SOURCES} ${VIEWMODELS_HEADERS}
+# Create the main library first
+add_library(GalaxyFactionsViewModels SHARED
+    ${VIEWMODELS_SOURCES}
+    ${VIEWMODELS_HEADERS}
 )
+
+# Add QML module later (currently disabled due to header path issues)
+# qt_add_qml_module(GalaxyFactionsViewModels
+#     URI GalaxyFactions.ViewModels
+#     VERSION 1.0
+#     SOURCES ${VIEWMODELS_SOURCES} ${VIEWMODELS_HEADERS}
+# )
 
 # Set target properties
 set_target_properties(GalaxyFactionsViewModels PROPERTIES
