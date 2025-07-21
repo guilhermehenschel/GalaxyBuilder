@@ -162,6 +162,9 @@ signals:
     void exportFinished(bool success, const QString& message);
     void importStarted();
     void importFinished(bool success, const QString& message);
+    
+    // Image export signal
+    void captureGalaxyImage(const QString& filePath, int width, int height);
 
 private:
     void initializeModels();

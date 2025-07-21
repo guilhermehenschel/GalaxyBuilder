@@ -17,6 +17,97 @@ Item {
     // Signal emitted when a system is double-clicked
     signal systemDoubleClicked(int systemId)
     
+    // Function to export galaxy content without UI elements
+    function exportGalaxyImage(filePath, width, height) {
+        // Create a temporary container that shows the entire galaxy without zoom/pan
+        var tempContainer = exportContainerComponent.createObject(root)
+        if (tempContainer) {
+            tempContainer.width = width
+            tempContainer.height = height
+            tempContainer.visible = true
+            
+            // Capture the temporary container
+            tempContainer.grabToImage(function(result) {
+                var success = result.saveToFile(filePath)
+                tempContainer.destroy()
+                
+                if (success) {
+                    GalaxyController.exportFinished(true, "Galaxy image exported successfully to " + filePath)
+                } else {
+                    GalaxyController.exportFinished(false, "Failed to save galaxy image to " + filePath)
+                }
+            })
+        }
+    }
+    
+    // Component for creating export-specific galaxy view
+    Component {
+        id: exportContainerComponent
+        Rectangle {
+            color: "#0a0a0a"
+            
+            Item {
+                anchors.fill: parent
+                
+                // Calculate scale to fit entire galaxy in the export size
+                property real exportScale: {
+                    if (controller && controller.galaxyWidth && controller.galaxyHeight) {
+                        var scaleX = width / controller.galaxyWidth
+                        var scaleY = height / controller.galaxyHeight
+                        return Math.min(scaleX, scaleY) * 0.9 // 90% to add some padding
+                    }
+                    return 1.0
+                }
+                
+                transform: [
+                    Translate {
+                        x: width/2
+                        y: height/2
+                    },
+                    Scale {
+                        xScale: exportScale
+                        yScale: exportScale
+                    },
+                    Translate {
+                        x: controller ? -controller.galaxyWidth/2 : 0
+                        y: controller ? -controller.galaxyHeight/2 : 0
+                    }
+                ]
+                
+                // Travel lanes for export
+                Repeater {
+                    model: controller && controller.galaxyViewModel && controller.showTravelLanes ? controller.galaxyViewModel.travelLanes : null
+                    
+                    delegate: TravelLane {
+                        startX: model.fromX
+                        startY: model.fromY
+                        endX: model.toX
+                        endY: model.toY
+                        laneOpacity: model.isActive ? 0.6 : 0.3
+                        laneColor: model.laneType === 0 ? "#00ffff" : "#ffff00"
+                    }
+                }
+                
+                // Star systems for export
+                Repeater {
+                    model: controller && controller.galaxyViewModel ? controller.galaxyViewModel.starSystems : null
+                    delegate: SystemNode {
+                        systemId: model.systemId
+                        systemName: model.name
+                        systemX: model.positionX
+                        systemY: model.positionY
+                        systemType: model.starType
+                        systemSize: model.systemSize
+                        isSelected: false // No selection in export
+                        showInfluenceRadius: false // No influence radius in export
+                        showSystemNames: true // Always show names in export
+                        controller: root.controller
+                    }
+                }
+            }
+        }
+    }
+    
     // Watch for zoom and pan changes (canvas removed, using model-based rendering)
     onZoomFactorChanged: {
         // View updates automatically through transform changes

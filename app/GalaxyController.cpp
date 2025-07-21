@@ -226,20 +226,16 @@ void GalaxyController::exportGalaxy(const QString& filePath)
 
 void GalaxyController::exportGalaxyImage(const QString& filePath, const QSize& size)
 {
-    Q_UNUSED(size)
-    
     if (!m_galaxyModel) {
         qWarning() << "Galaxy model not initialized";
         emit exportFinished(false, "Galaxy not generated yet");
         return;
     }
     
-    qDebug() << "Galaxy image export requested to:" << filePath;
+    qDebug() << "Galaxy image export requested to:" << filePath << "with size:" << size;
     
-    // For now, just indicate that image export is not implemented
-    QString message = "Galaxy image export not yet implemented";
-    qWarning() << message;
-    emit exportFinished(false, message);
+    // Signal to QML to capture the galaxy view
+    emit captureGalaxyImage(filePath, size.width(), size.height());
 }
 
 void GalaxyController::exportStarSystem(const QString& systemName, const QString& filePath)

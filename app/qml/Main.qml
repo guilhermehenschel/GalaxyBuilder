@@ -61,6 +61,18 @@ ApplicationWindow {
         }
     }
     
+    // Connections to handle image export
+    Connections {
+        target: GalaxyController
+        function onCaptureGalaxyImage(filePath, width, height) {
+            // Remove file:// prefix if present
+            var cleanPath = filePath.toString().replace(/^file:\/+/, "")
+            
+            // Use the galaxy view's export function to capture only galaxy content
+            galaxyView.exportGalaxyImage(cleanPath, width, height)
+        }
+    }
+    
     // System Properties Window
     SystemPropertiesDialog {
         id: systemPropertiesWindow
