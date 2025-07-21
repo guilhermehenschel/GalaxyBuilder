@@ -1,0 +1,84 @@
+@startuml
+interface "Galaxy Builder App" as GBA
+package ggh{
+package GalaxyCore{
+    class GalaxyCoreSystem as "System"
+}
+package galaxy{
+package faction{
+    class GalaxyFactions {
+        +createFaction(name: string, description: string, color: string): Faction
+        +modifyFaction(id: int, name: string, description: string, color: string): Faction
+        +exportFactions(format: string): void
+    }
+
+    class Faction {
+        +id: int
+        +name: string
+        +description: string
+        +color: string
+        +systems: List<System>
+
+        * getSystems(): List<System>
+        * addSystem(system: System): void
+        * removeSystem(systemId: int): void
+        * getFactionDetails(): string
+        * getResourceBonuses(): List<SystemResourceBonus>
+        * getNotes(): List<SystemNotes>
+        * getResourceBonusesByType(resourceTypeId: int): int
+        * getResourcesStock(): Map<int, int>
+    }
+
+    class System {
+        +id: int
+        +name: string
+        +description: string
+        +resources: List<ResourceType>
+        +resourceBonuses: List<Pair<ResourceType, int>>
+        +notes: List<SystemNotes>
+
+        * getResourceBonuses(): List<Pair<ResourceType, int>>
+        * getNotes(): List<SystemNotes>
+        * getResourceBonusByType(resourceTypeId: int): int
+        * getHandoverHistory(): List<FactionHandover>
+    }
+
+    class ResourceType as "ggh.galaxy.factions.ResourceType" {
+        +id: int
+        +name: string
+        +description: string
+    }
+
+    class SystemNotes as "ggh.galaxy.factions.SystemNotes" {
+        +id: int
+        +systemId: int
+        +note: string
+    }
+
+    class SystemResourceBonus as "ggh.galaxy.factions.SystemResourceBonus" {
+        +id: int
+        +systemId: int
+        +resourceTypeId: int
+        +bonusAmount: float
+    }
+
+    class FactionHandover as "ggh.galaxy.factions.FactionHandover" {
+        +id: int
+        +factionToId: int
+        +systemId: int
+        +factionFromId: int
+        +handoverTypeId: int
+        +handoverDate: date
+        +notes: string
+    }
+}
+}
+}
+
+ggh.galaxy.factions.Faction ||--o{ ggh.galaxy.factions.System : controls
+ggh.galaxy.factions.System }o--|| ggh.GalaxyCore.System : "is part of"
+ggh.galaxy.factions.System |o--o{ ggh.galaxy.factions.ResourceType : has
+ggh.galaxy.factions.System |o--o{ ggh.galaxy.factions.SystemResourceBonus : has
+ggh.galaxy.factions.System |o--o{ ggh.galaxy.factions.SystemNotes : has
+ggh.galaxy.factions.System |o--o{ ggh.galaxy.factions.FactionHandover : has
+@enduml

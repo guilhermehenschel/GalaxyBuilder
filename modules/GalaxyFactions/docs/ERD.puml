@@ -1,0 +1,74 @@
+@startuml ERD
+' Use crow's foot notation for ERD
+hide circle
+skinparam linetype ortho
+
+entity "Faction" as F {
+  +id: int
+  +name: string
+  +description: string
+  +color: string
+}
+
+entity "System" as S {
+  +id: int
+  +name: string
+  +description: string
+}
+
+entity "Galaxy" as G {
+  +id: int
+  +name: string
+  +description: string
+}
+
+entity "ResourceType" as RT {
+  +id: int
+  +name: string
+  +description: string
+}
+
+entity "SystemResourceBonus" as SRB {
+  +id: int
+  +systemId: int
+  +resourceTypeId: int
+  +bonusAmount: float
+}
+
+entity "SystemNotes" as SN {
+  +id: int
+  +systemId: int
+  +note: string
+}
+
+entity "HandoverType" as HT {
+  +id: int
+  +name: string
+  +description: string
+}
+
+entity "FactionHandover" as FH {
+  +id: int
+  +factionToId: int
+  +systemId: int
+  +factionFromId: int
+  +handoverTypeId: int
+  +handoverDate: date
+  +notes: string
+}
+
+F ||--o{ S : controls
+S }o--|| G : belongs to
+S |o--o{ RT : has
+S |o--o{ SRB : has
+S |o--o{ SN : has
+RT ||--o{ SRB : provides bonus
+F ||--o{ FH : initiates
+FH }o--|| S : applies to
+FH }o--|| F : from faction
+FH }o--|| HT : uses handover type
+
+G ||--o{ F : contains factions
+G ||--o{ S : contains systems
+G ||--o{ RT : contains resource types
+@enduml

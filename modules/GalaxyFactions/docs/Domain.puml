@@ -1,0 +1,20 @@
+
+
+@startuml
+interface "Galaxy Builder App" as GBA
+component GalaxyFactions
+component GalaxyCore
+component GalaxyFactories
+component GalaxyExporter
+
+GBA --> GalaxyFactions : uses
+GBA --> GalaxyCore : uses
+GBA --> GalaxyFactories : uses
+GBA --> GalaxyExporter : uses
+
+GalaxyFactions --> GalaxyCore : depends on
+GalaxyFactories --> GalaxyFactions : depends on
+GalaxyExporter --> GalaxyFactions : depends 
+
+note right of GalaxyFactions:"GalaxyFactions is the main module for managing galaxy factions, providing functionality to create, modify, and export faction data."
+@enduml

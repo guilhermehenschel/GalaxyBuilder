@@ -17,6 +17,7 @@ set(HEADER_FILES
     include/ggh/modules/GalaxyCore/models/PlanetModel.h
     include/ggh/modules/GalaxyCore/models/StarSystemModel.h
     include/ggh/modules/GalaxyCore/models/TravelLaneModel.h
+    include/ggh/modules/GalaxyCore/models/GalacticDate.h
 )
 
 set(SRC_FILES
