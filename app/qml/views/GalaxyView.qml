@@ -3,7 +3,6 @@ import QtQuick.Controls
 import QtQml
 import GalaxyBuilderApp 1.0
 import GalaxyCore.ViewModels 1.0
-import GalaxyCore.Model 1.0
 
 Item {
     id: root

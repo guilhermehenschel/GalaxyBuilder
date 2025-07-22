@@ -91,6 +91,27 @@ endif()
 
 add_library(GGH::GalaxyCore::ViewModels ALIAS GalaxyCoreViewModelsLib)
 
+# Add custom command to deploy QML plugin to runtime location
+add_custom_command(TARGET GalaxyCoreViewModels POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+        "${CMAKE_BINARY_DIR}/bin/qml/GalaxyCore/ViewModels"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_BINARY_DIR}/qml/GalaxyCore/ViewModels/qmldir"
+        "${CMAKE_BINARY_DIR}/bin/qml/GalaxyCore/ViewModels/"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_BINARY_DIR}/qml/GalaxyCore/ViewModels/GalaxyCoreViewModels.qmltypes"
+        "${CMAKE_BINARY_DIR}/bin/qml/GalaxyCore/ViewModels/"
+    COMMENT "Deploying GalaxyCoreViewModels QML plugin to runtime location"
+)
+
+# Add separate command to copy plugin DLL after the plugin is built
+add_custom_command(TARGET GalaxyCoreViewModelsplugin POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "$<TARGET_FILE:GalaxyCoreViewModelsplugin>"
+        "${CMAKE_BINARY_DIR}/bin/qml/GalaxyCore/ViewModels/"
+    COMMENT "Copying GalaxyCoreViewModels plugin DLL"
+)
+
 # Install headers
 install(FILES ${HEADER_FILES}
     DESTINATION include/GalaxyCore/models

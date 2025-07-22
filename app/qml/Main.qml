@@ -3,11 +3,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
 import GalaxyBuilderApp 1.0
-import GalaxyCore.ViewModels
-import GalaxyCore.Model
-import Galaxy.Factories
-import Galaxy.Exporters
-import "components"
 
 ApplicationWindow {
     id: mainWindow
@@ -77,6 +72,19 @@ ApplicationWindow {
     SystemPropertiesDialog {
         id: systemPropertiesWindow
         visible: false
+    }
+    
+    // Function to show faction manager window
+    function showFactionManager() {
+        var component = Qt.createComponent("views/FactionManagerView.qml")
+        if (component.status === Component.Ready) {
+            var window = component.createObject(mainWindow)
+            if (window !== null) {
+                window.show()
+            }
+        } else {
+            console.log("Error loading FactionManagerView:", component.errorString())
+        }
     }
     
     // Function to show system properties dialog

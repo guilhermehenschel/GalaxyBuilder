@@ -62,8 +62,25 @@ target_link_libraries(GalaxyBuilderApp PRIVATE
     Qt6::QuickControls2
     GGH::GalaxyCore::ViewModels
     GGH::GalaxyCore::Models
+    GGH::Galaxy::Factions::ViewModels
     GGH::GalaxyExporter
     GGH::GalaxyFactories
+)
+
+# Add custom command to ensure all QML modules are deployed before running the app
+add_custom_command(TARGET GalaxyBuilderApp POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E echo "Ensuring all QML modules are deployed to runtime location..."
+    COMMENT "QML Module deployment verification"
+)
+
+# Make sure the app depends on all QML module targets to ensure proper build order
+add_dependencies(GalaxyBuilderApp 
+    GalaxyCoreViewModels
+    GalaxyCoreViewModelsplugin
+    GalaxyFactionsViewModels
+    GalaxyFactionsViewModelsplugin
+    GalaxyFactories
+    GalaxyFactoriesplugin
 )
 
 # Set target properties

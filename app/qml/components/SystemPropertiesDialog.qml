@@ -4,7 +4,6 @@ import QtQuick.Layouts
 import QtQuick.Window
 import GalaxyBuilderApp 1.0
 import GalaxyCore.ViewModels 1.0
-import GalaxyCore.Model 1.0
 
 ApplicationWindow {
     id: window

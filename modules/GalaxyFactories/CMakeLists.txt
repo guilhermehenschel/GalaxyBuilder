@@ -88,6 +88,27 @@ target_include_directories(GalaxyFactories
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+# Add custom command to deploy QML plugin to runtime location
+add_custom_command(TARGET GalaxyFactories POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+        "${CMAKE_BINARY_DIR}/bin/qml/Galaxy/Factories"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_BINARY_DIR}/qml/Galaxy/Factories/qmldir"
+        "${CMAKE_BINARY_DIR}/bin/qml/Galaxy/Factories/"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_BINARY_DIR}/qml/Galaxy/Factories/GalaxyFactories.qmltypes"
+        "${CMAKE_BINARY_DIR}/bin/qml/Galaxy/Factories/"
+    COMMENT "Deploying GalaxyFactories QML plugin to runtime location"
+)
+
+# Add separate command to copy plugin DLL after the plugin is built
+add_custom_command(TARGET GalaxyFactoriesplugin POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "$<TARGET_FILE:GalaxyFactoriesplugin>"
+        "${CMAKE_BINARY_DIR}/bin/qml/Galaxy/Factories/"
+    COMMENT "Copying GalaxyFactories plugin DLL"
+)
+
 # Install the library (without export since it's a QML module)
 install(TARGETS GalaxyFactories
     LIBRARY DESTINATION lib

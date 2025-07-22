@@ -48,6 +48,9 @@ int main(int argc, char *argv[])
     std::cout << "Registered GalaxyController singleton" << std::endl;
     qDebug() << "Registered GalaxyController singleton";
     
+    std::cout << "Using automatic QML_ELEMENT registration for all ViewModels" << std::endl;
+    qDebug() << "Using automatic QML_ELEMENT registration for all ViewModels";
+    
     // Add QML import paths
     engine.addImportPath("qrc:/qml");
     engine.addImportPath(":/qml");

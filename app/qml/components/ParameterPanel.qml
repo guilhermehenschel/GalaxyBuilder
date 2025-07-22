@@ -275,6 +275,102 @@ ScrollView {
             }
         }
         
+        // Galaxy Management Group
+        GroupBox {
+            title: "Galaxy Management"
+            Layout.fillWidth: true
+            
+            background: Rectangle {
+                color: "#3d3d3d"
+                border.color: "#505050"
+                border.width: 1
+                radius: 4
+            }
+            
+            label: Text {
+                text: parent.title
+                color: "#ffffff"
+                font.pixelSize: 14
+                font.bold: true
+            }
+            
+            ColumnLayout {
+                anchors.fill: parent
+                spacing: 8
+                
+                Button {
+                    id: factionManagerButton
+                    text: "Manage Factions"
+                    Layout.fillWidth: true
+                    
+                    background: Rectangle {
+                        color: parent.pressed ? "#304080" : (parent.hovered ? "#405090" : "#304070")
+                        border.color: "#5080c0"
+                        border.width: 1
+                        radius: 4
+                    }
+                    
+                    contentItem: Text {
+                        text: parent.text
+                        color: "#ffffff"
+                        font.pixelSize: 12
+                        font.bold: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    
+                    onClicked: {
+                        console.log("Opening Faction Manager...")
+                        mainWindow.showFactionManager()
+                    }
+                }
+                
+                Button {
+                    text: "Manage Systems"
+                    Layout.fillWidth: true
+                    enabled: false // TODO: Implement system management
+                    
+                    background: Rectangle {
+                        color: parent.enabled ? (parent.pressed ? "#804030" : (parent.hovered ? "#905040" : "#704030")) : "#505050"
+                        border.color: parent.enabled ? "#c08050" : "#707070"
+                        border.width: 1
+                        radius: 4
+                    }
+                    
+                    contentItem: Text {
+                        text: parent.text
+                        color: parent.enabled ? "#ffffff" : "#a0a0a0"
+                        font.pixelSize: 12
+                        font.bold: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                }
+                
+                Button {
+                    text: "Trade Routes"
+                    Layout.fillWidth: true
+                    enabled: false // TODO: Implement trade route management
+                    
+                    background: Rectangle {
+                        color: parent.enabled ? (parent.pressed ? "#308040" : (parent.hovered ? "#409050" : "#307040")) : "#505050"
+                        border.color: parent.enabled ? "#50c080" : "#707070"
+                        border.width: 1
+                        radius: 4
+                    }
+                    
+                    contentItem: Text {
+                        text: parent.text
+                        color: parent.enabled ? "#ffffff" : "#a0a0a0"
+                        font.pixelSize: 12
+                        font.bold: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                }
+            }
+        }
+        
         // Display Options Group
         GroupBox {
             title: "Display Options"

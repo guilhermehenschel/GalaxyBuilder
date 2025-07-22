@@ -38,18 +38,19 @@ set(VIEWMODELS_SOURCES
     src/GalaxyFactionsViewModel.cpp
 )
 
+# Create the QML module
+qt_add_qml_module(GalaxyFactionsViewModels
+    URI Galaxy.Factions.ViewModels
+    VERSION 1.0
+    OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/qml/Galaxy/Factions/ViewModels
+    SOURCES ${VIEWMODELS_SOURCES} ${VIEWMODELS_HEADERS}
+)
+
 # Create the main library first
-add_library(GalaxyFactionsViewModels SHARED
+add_library(GalaxyFactionsViewModelsLib STATIC
     ${VIEWMODELS_SOURCES}
     ${VIEWMODELS_HEADERS}
 )
-
-# Add QML module later (currently disabled due to header path issues)
-# qt_add_qml_module(GalaxyFactionsViewModels
-#     URI GalaxyFactions.ViewModels
-#     VERSION 1.0
-#     SOURCES ${VIEWMODELS_SOURCES} ${VIEWMODELS_HEADERS}
-# )
 
 # Set target properties
 set_target_properties(GalaxyFactionsViewModels PROPERTIES
@@ -68,6 +69,9 @@ target_include_directories(GalaxyFactionsViewModels
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ggh/modules/GalaxyFactions/viewmodels
 )
 
 # Link libraries for QML module
@@ -80,12 +84,6 @@ target_link_libraries(GalaxyFactionsViewModels
         Qt6::Gui
         Qt6::Quick
         Qt6::Qml
-)
-
-# Create static library for internal use
-add_library(GalaxyFactionsViewModelsLib STATIC
-    ${VIEWMODELS_SOURCES}
-    ${VIEWMODELS_HEADERS}
 )
 
 target_link_libraries(GalaxyFactionsViewModelsLib
@@ -104,20 +102,8 @@ target_include_directories(GalaxyFactionsViewModelsLib
         $<INSTALL_INTERFACE:include>
 )
 
-# Set properties for static library
-set_target_properties(GalaxyFactionsViewModelsLib PROPERTIES
-    CXX_STANDARD 23
-    CXX_STANDARD_REQUIRED ON
-    CXX_EXTENSIONS OFF
-    VERSION ${PROJECT_VERSION}
-    SOVERSION ${PROJECT_VERSION_MAJOR}
-    ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
-    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-)
-
 # Create alias for the library
-add_library(GGH::Galaxy::Factions::ViewModels ALIAS GalaxyFactionsViewModels)
+add_library(GGH::Galaxy::Factions::ViewModels ALIAS GalaxyFactionsViewModelsLib)
 
 # Enable testing for this module
 if(BUILD_TESTING)
@@ -125,8 +111,30 @@ if(BUILD_TESTING)
     add_subdirectory(tests)
 endif()
 
+# Add custom command to deploy QML plugin to runtime location
+add_custom_command(TARGET GalaxyFactionsViewModels POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+        "${CMAKE_BINARY_DIR}/bin/qml/Galaxy/Factions/ViewModels"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_BINARY_DIR}/qml/Galaxy/Factions/ViewModels/qmldir"
+        "${CMAKE_BINARY_DIR}/bin/qml/Galaxy/Factions/ViewModels/"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_BINARY_DIR}/qml/Galaxy/Factions/ViewModels/GalaxyFactionsViewModels.qmltypes"
+        "${CMAKE_BINARY_DIR}/bin/qml/Galaxy/Factions/ViewModels/"
+    COMMENT "Deploying GalaxyFactionsViewModels QML plugin to runtime location"
+)
+
+# Add separate command to copy plugin DLL after the plugin is built
+add_custom_command(TARGET GalaxyFactionsViewModelsplugin POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "$<TARGET_FILE:GalaxyFactionsViewModelsplugin>"
+        "${CMAKE_BINARY_DIR}/bin/qml/Galaxy/Factions/ViewModels/"
+    COMMENT "Copying GalaxyFactionsViewModels plugin DLL"
+)
+
 # Install the library
 install(TARGETS GalaxyFactionsViewModels GalaxyFactionsViewModelsLib
+    EXPORT GalaxyFactionsTargets
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
     RUNTIME DESTINATION bin
