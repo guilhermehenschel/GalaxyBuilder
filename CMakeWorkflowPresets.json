@@ -1,0 +1,78 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 25,
+        "patch": 0
+    },
+    "workflowPresets": [
+        {
+            "name": "qml-quality-check",
+            "displayName": "QML Quality Check",
+            "description": "Run QML linting and formatting on all QML files",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "windows-debug"
+                },
+                {
+                    "type": "build",
+                    "name": "qml-lint-all"
+                },
+                {
+                    "type": "build", 
+                    "name": "qml-format-all"
+                }
+            ]
+        },
+        {
+            "name": "qml-lint-only",
+            "displayName": "QML Lint Only",
+            "description": "Run QML linting checks without formatting",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "windows-debug"
+                },
+                {
+                    "type": "build",
+                    "name": "qml-lint-all"
+                }
+            ]
+        },
+        {
+            "name": "qml-format-only",
+            "displayName": "QML Format Only", 
+            "description": "Run QML formatting without linting",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "windows-debug"
+                },
+                {
+                    "type": "build",
+                    "name": "qml-format-all"
+                }
+            ]
+        },
+        {
+            "name": "build-and-qml-quality",
+            "displayName": "Build + QML Quality",
+            "description": "Full build with QML quality checks",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "windows-debug"
+                },
+                {
+                    "type": "build",
+                    "name": "windows-debug"
+                },
+                {
+                    "type": "build",
+                    "name": "qml-quality"
+                }
+            ]
+        }
+    ]
+}

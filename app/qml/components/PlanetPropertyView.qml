@@ -16,7 +16,7 @@ Rectangle {
     border.color: isCurrentItem ? "#0088ff" : "#606060"
     border.width: 1
     radius: 3
-    
+
     // Show placeholder when planet is null
     Text {
         anchors.centerIn: parent
@@ -28,7 +28,7 @@ Rectangle {
     MouseArea {
         anchors.fill: parent
         onClicked: {
-            ListView.view.currentIndex = index
+            ListView.view.currentIndex = index;
         }
     }
 
@@ -57,7 +57,8 @@ Rectangle {
                 border.color: "#606060"
                 radius: 3
             }
-            onEditingFinished: if (planet) planet.name = text
+            onEditingFinished: if (planet)
+                planet.name = text
         }
 
         Text {
@@ -82,7 +83,8 @@ Rectangle {
                 leftPadding: 10
             }
 
-            onCurrentIndexChanged: if (planet) planet.type = currentIndex
+            onCurrentIndexChanged: if (planet)
+                planet.type = currentIndex
         }
 
         Text {
@@ -109,7 +111,8 @@ Rectangle {
                 readOnly: !parent.editable
             }
 
-            onValueModified: if (planet) planet.numberOfMoons = value
+            onValueModified: if (planet)
+                planet.numberOfMoons = value
         }
 
         Text {
@@ -136,7 +139,8 @@ Rectangle {
                 readOnly: !parent.editable
             }
 
-            onValueModified: if (planet) planet.size = value
+            onValueModified: if (planet)
+                planet.size = value
         }
 
         Text {
@@ -164,7 +168,8 @@ Rectangle {
                 readOnly: !parent.editable
             }
 
-            onValueModified: if (planet) planet.mass = value / 100.0
+            onValueModified: if (planet)
+                planet.mass = value / 100.0
         }
 
         Text {
@@ -192,7 +197,8 @@ Rectangle {
                 readOnly: !parent.editable
             }
 
-            onValueModified: if (planet) planet.gForce = value / 100.0
+            onValueModified: if (planet)
+                planet.gForce = value / 100.0
         }
 
         Text {
@@ -219,7 +225,8 @@ Rectangle {
                 readOnly: !parent.editable
             }
 
-            onValueModified: if (planet) planet.minTemperature = value
+            onValueModified: if (planet)
+                planet.minTemperature = value
         }
 
         Text {
@@ -246,7 +253,8 @@ Rectangle {
                 readOnly: !parent.editable
             }
 
-            onValueModified: if (planet) planet.maxTemperature = value
+            onValueModified: if (planet)
+                planet.maxTemperature = value
         }
 
         Text {
@@ -273,7 +281,8 @@ Rectangle {
                 readOnly: !parent.editable
             }
 
-            onValueModified: if (planet) planet.orbitalRadius = value
+            onValueModified: if (planet)
+                planet.orbitalRadius = value
         }
     }
 }

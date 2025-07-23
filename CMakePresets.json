@@ -117,6 +117,27 @@
             "displayName": "Linux Release Build",
             "configurePreset": "linux-release",
             "verbose": false
+        },
+        {
+            "name": "qml-lint-all",
+            "displayName": "QML Lint All Files",
+            "configurePreset": "windows-debug",
+            "targets": ["qml-lint-all"],
+            "verbose": true
+        },
+        {
+            "name": "qml-format-all",
+            "displayName": "QML Format All Files",
+            "configurePreset": "windows-debug",
+            "targets": ["qml-format-all"],
+            "verbose": true
+        },
+        {
+            "name": "qml-quality",
+            "displayName": "QML Quality Check (Lint + Format)",
+            "configurePreset": "windows-debug",
+            "targets": ["qml-quality"],
+            "verbose": true
         }
     ],
     "testPresets": [

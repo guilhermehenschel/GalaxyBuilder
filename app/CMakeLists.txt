@@ -54,6 +54,23 @@ qt_add_qml_module(GalaxyBuilderApp
         qml/components/SystemPropertiesManager.qml
         qml/components/GalaxyManager.qml
         qml/components/PlanetPropertyView.qml
+        qml/components/NewFactionDialog.qml
+        qml/components/FactionXMLExporter.qml
+        qml/components/faction/FactionActionButtons.qml
+        qml/components/faction/FactionColorEditor.qml
+        qml/components/faction/FactionColorIndicator.qml
+        qml/components/faction/FactionDescriptionEditor.qml
+        qml/components/faction/FactionDetailHeader.qml
+        qml/components/faction/FactionInfoDisplay.qml
+        qml/components/faction/FactionInformation.qml
+        qml/components/faction/FactionNameEditor.qml
+        qml/components/faction/FactionResourceBonuses.qml
+        qml/components/faction/FactionResourceStock.qml
+        qml/components/faction/FactionStatistics.qml
+        qml/components/faction/FactionSystems.qml
+
+
+
         qml/views/GalaxyView.qml
         qml/views/FactionManagerView.qml
         
@@ -158,6 +175,23 @@ install(TARGETS GalaxyBuilderApp
 if(WIN32)
     include(${CMAKE_SOURCE_DIR}/cmake/WindowsInstall.cmake)
     galaxy_builder_deploy_qt_windows(GalaxyBuilderApp)
+endif()
+
+# Add QML linting and formatting targets
+if(BUILD_QT_APP)
+    # Collect all QML files in the app
+    file(GLOB_RECURSE APP_QML_FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/qml/*.qml"
+        "${CMAKE_CURRENT_SOURCE_DIR}/qml/*.js"
+    )
+    
+    # Create QML lint target for app
+    add_qml_lint_target("GalaxyBuilderApp" "${APP_QML_FILES}")
+    
+    # Create QML format target for app
+    add_qml_format_target("GalaxyBuilderApp" "${APP_QML_FILES}")
+    
+    message(STATUS "Added QML quality targets for ${APP_QML_FILES}")
 endif()
 
 # Install Qt6 runtime dependencies for packaging

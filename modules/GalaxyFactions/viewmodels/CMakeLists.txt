@@ -80,6 +80,7 @@ target_link_libraries(GalaxyFactionsViewModels
     PUBLIC
         GGH::Galaxy::Factions::Models
         GGH::GalaxyCore::Models
+        GGH::GalaxyCore::ViewModels
         GGH::GalaxyCore::Utilities
         Qt6::Core
         Qt6::Gui
@@ -91,6 +92,7 @@ target_link_libraries(GalaxyFactionsViewModelsLib
     PUBLIC
         GGH::Galaxy::Factions::Models
         GGH::GalaxyCore::Models
+        GGH::GalaxyCore::ViewModels
         GGH::GalaxyCore::Utilities
         Qt6::Gui
         Qt6::Core

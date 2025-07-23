@@ -44,7 +44,7 @@ public:
      * @brief Gets the faction list model
      * @return Pointer to the faction list model
      */
-    FactionListModel* factionListModel() const;
+    FactionListModel* factionListModel();
     
     /**
      * @brief Gets the currently selected faction ID
@@ -73,16 +73,50 @@ public:
     Q_INVOKABLE void addFaction(const QString& name, const QString& description, const QString& color);
     
     /**
+     * @brief Adds a new faction with homeworld system
+     * @param name The faction name
+     * @param description The faction description
+     * @param color The faction color
+     * @param homeworldSystemId The ID of the homeworld star system
+     * @param starSystemModel The star system model for the homeworld
+     * @return The ID of the created faction, or -1 if creation failed
+     */
+    Q_INVOKABLE int addFactionWithHomeworld(const QString& name, const QString& description, const QString& color, quint32 homeworldSystemId, QObject* starSystemModel);
+    
+    /**
      * @brief Removes a faction by ID
      * @param factionId The ID of the faction to remove
      */
     Q_INVOKABLE void removeFaction(int factionId);
+    
+    /**
+     * @brief Exports all factions to XML format
+     * @return XML string containing all faction data
+     */
+    Q_INVOKABLE QString exportToXml() const;
+    
+    /**
+     * @brief Exports all factions to XML file
+     * @param filePath The file path to export to
+     * @return True if export was successful, false otherwise
+     */
+    Q_INVOKABLE bool exportToXmlFile(const QString& filePath) const;
 
 signals:
     /**
      * @brief Signal emitted when the faction list model changes
      */
     void factionListModelChanged();
+    
+    /**
+     * @brief Signal emitted when a new faction is created
+     * @param factionId The ID of the newly created faction
+     * @param homeworldSystemId The ID of the homeworld star system
+     * @param factionName The name of the faction
+     * @param factionDescription The description of the faction
+     * @param factionColor The color of the faction
+     */
+    void factionCreated(int factionId, quint32 homeworldSystemId, const QString& factionName, const QString& factionDescription, const QString& factionColor);
     
     /**
      * @brief Signal emitted when the selected faction ID changes

@@ -10,6 +10,8 @@
 
 #include "ggh/modules/GalaxyFactions/viewmodels/GalaxyFactionsViewModel.h"
 #include "ggh/modules/GalaxyFactions/models/GalaxyFactions.h"
+#include "ggh/modules/GalaxyCore/models/StarSystemModel.h"
+#include "ggh/modules/GalaxyCore/viewmodels/StarSystemViewModel.h"
 
 class TestGalaxyFactionsViewModel : public QObject
 {
@@ -35,6 +37,11 @@ private slots:
      * @brief Test adding factions
      */
     void testAddFaction();
+    
+    /**
+     * @brief Test adding factions with homeworld system
+     */
+    void testAddFactionWithHomeworld();
     
     /**
      * @brief Test removing factions
@@ -154,6 +161,64 @@ void TestGalaxyFactionsViewModel::testRemoveFaction()
     // The selected faction ID should be cleared
     QCOMPARE(viewModel.selectedFactionId(), -1);
     QCOMPARE(selectedIdSpy.count(), 1);
+}
+
+void TestGalaxyFactionsViewModel::testAddFactionWithHomeworld()
+{
+    ggh::Galaxy::Factions::viewmodels::GalaxyFactionsViewModel viewModel;
+    
+    // Initialize with galaxy factions model
+    auto galaxyFactions = std::make_shared<ggh::Galaxy::Factions::models::GalaxyFactions>();
+    viewModel.initialize(galaxyFactions);
+    
+    QCOMPARE(viewModel.factionListModel()->rowCount(), 0);
+    
+    // Create a mock star system model
+    auto starSystemModel = std::make_shared<ggh::GalaxyCore::models::StarSystemModel>(
+        1, "Test System", ggh::GalaxyCore::utilities::CartesianCoordinates<double>(100.0, 200.0)
+    );
+    
+    // Create a StarSystemViewModel wrapper
+    auto starSystemViewModel = new ggh::GalaxyCore::viewmodels::StarSystemViewModel(starSystemModel);
+    
+    // Set up signal spy for faction creation
+    QSignalSpy factionCreatedSpy(&viewModel, &ggh::Galaxy::Factions::viewmodels::GalaxyFactionsViewModel::factionCreated);
+    
+    // Add a faction with homeworld
+    int factionId = viewModel.addFactionWithHomeworld(
+        "Test Faction", 
+        "Test Description", 
+        "#FF0000", 
+        1, 
+        starSystemViewModel
+    );
+    
+    // The faction should be created successfully
+    QVERIFY(factionId >= 0);
+    
+    // The faction list model should now contain the new faction
+    QCOMPARE(viewModel.factionListModel()->rowCount(), 1);
+    
+    // Verify the faction data
+    QModelIndex index = viewModel.factionListModel()->index(0, 0);
+    QCOMPARE(viewModel.factionListModel()->data(index, ggh::Galaxy::Factions::viewmodels::FactionListModel::NameRole).toString(), 
+             QString("Test Faction"));
+    QCOMPARE(viewModel.factionListModel()->data(index, ggh::Galaxy::Factions::viewmodels::FactionListModel::DescriptionRole).toString(), 
+             QString("Test Description"));
+    QCOMPARE(viewModel.factionListModel()->data(index, ggh::Galaxy::Factions::viewmodels::FactionListModel::ColorRole).toString(), 
+             QString("#FF0000"));
+    
+    // Verify the signal was emitted with correct parameters
+    QCOMPARE(factionCreatedSpy.count(), 1);
+    QList<QVariant> arguments = factionCreatedSpy.takeFirst();
+    QCOMPARE(arguments.at(0).toInt(), factionId);          // factionId
+    QCOMPARE(arguments.at(1).toUInt(), 1u);                // homeworldSystemId
+    QCOMPARE(arguments.at(2).toString(), QString("Test Faction"));     // factionName
+    QCOMPARE(arguments.at(3).toString(), QString("Test Description")); // factionDescription
+    QCOMPARE(arguments.at(4).toString(), QString("#FF0000"));          // factionColor
+    
+    // Clean up
+    delete starSystemViewModel;
 }
 
 void TestGalaxyFactionsViewModel::testFactionListModel()

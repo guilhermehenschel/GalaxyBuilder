@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Material
-import GalaxyBuilderApp 1.0
+import "./faction"
 
 /**
  * @brief Individual faction item in the list view (refactored with modular components)

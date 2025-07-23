@@ -20,6 +20,10 @@
 #include "ggh/modules/GalaxyExporter/ExporterObject.h"
 #include "ggh/modules/GalaxyFactories/XmlGalaxyImporter.h"
 
+// GalaxyFactions includes
+#include "ggh/modules/GalaxyFactions/models/GalaxyFactions.h"
+#include "ggh/modules/GalaxyFactions/viewmodels/GalaxyFactionsViewModel.h"
+
 class GalaxyController : public QObject
 {
     Q_OBJECT
@@ -30,6 +34,7 @@ class GalaxyController : public QObject
     Q_PROPERTY(ggh::GalaxyFactories::GalaxyGenerator* galaxyGenerator READ galaxyGenerator NOTIFY galaxyGeneratorChanged)
     Q_PROPERTY(ggh::Galaxy::Exporter::ExporterObject* exporterObject READ exporterObject NOTIFY exporterObjectChanged)
     Q_PROPERTY(ggh::GalaxyFactories::XmlGalaxyImporter* xmlImporter READ xmlImporter NOTIFY xmlImporterChanged)
+    Q_PROPERTY(ggh::Galaxy::Factions::viewmodels::GalaxyFactionsViewModel* galaxyFactionsViewModel READ galaxyFactionsViewModel NOTIFY galaxyFactionsViewModelChanged)
     
     // System selection properties
     Q_PROPERTY(ggh::GalaxyCore::viewmodels::StarSystemViewModel* selectedStarSystemViewModel READ selectedStarSystemViewModel NOTIFY selectedStarSystemViewModelChanged)
@@ -65,6 +70,7 @@ public:
     ggh::GalaxyFactories::GalaxyGenerator* galaxyGenerator() const;
     ggh::Galaxy::Exporter::ExporterObject* exporterObject() const;
     ggh::GalaxyFactories::XmlGalaxyImporter* xmlImporter() const;
+    ggh::Galaxy::Factions::viewmodels::GalaxyFactionsViewModel* galaxyFactionsViewModel() const;
     
     // System selection property getters
     ggh::GalaxyCore::viewmodels::StarSystemViewModel* selectedStarSystemViewModel() const;
@@ -133,6 +139,7 @@ signals:
     void galaxyGeneratorChanged();
     void exporterObjectChanged();
     void xmlImporterChanged();
+    void galaxyFactionsViewModelChanged();
     
     // System selection signals
     void selectedStarSystemViewModelChanged();
@@ -175,6 +182,10 @@ private:
     ggh::GalaxyFactories::GalaxyGenerator* m_galaxyGenerator;
     ggh::Galaxy::Exporter::ExporterObject* m_exporterObject;
     ggh::GalaxyFactories::XmlGalaxyImporter* m_xmlImporter;
+    
+    // GalaxyFactions model and view model
+    std::shared_ptr<ggh::Galaxy::Factions::models::GalaxyFactions> m_galaxyFactions;
+    ggh::Galaxy::Factions::viewmodels::GalaxyFactionsViewModel* m_galaxyFactionsViewModel;
     
     // System selection state
     quint32 m_selectedSystemId;

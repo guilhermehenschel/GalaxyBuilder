@@ -23,7 +23,7 @@ Item {
         color: (starModel && starModel.color) ? starModel.color : "#ffff80"
         border.color: "#ffffff"
         border.width: 1
-        
+
         // Star glow effect
         Rectangle {
             anchors.centerIn: parent
@@ -40,7 +40,7 @@ Item {
 
         Item {
             anchors.centerIn: parent
-            
+
             // Orbit circle
             Rectangle {
                 id: orbit
@@ -53,7 +53,7 @@ Item {
                 border.width: 1
                 opacity: 0.5
             }
-            
+
             // Planet
             Rectangle {
                 id: planet
@@ -63,23 +63,21 @@ Item {
                 color: model.planetColor || "#808080"
                 border.color: "#ffffff"
                 border.width: 1
-                x: starViz.width + parent.width/2 + model.orbitalRadius*15 - width/2
-                y: parent.height/2 - height/2
-                
+                x: starViz.width + parent.width / 2 + model.orbitalRadius * 15 - width / 2
+                y: parent.height / 2 - height / 2
+
                 ToolTip {
                     visible: planetMouseArea.containsMouse
-                    text: model.name + "\nType: " + model.planetTypeName + 
-                            "\nMoons: " + model.numberOfMoons + 
-                            "\nMass: " + model.mass.toFixed(2) + " Earth masses"
+                    text: model.name + "\nType: " + model.planetTypeName + "\nMoons: " + model.numberOfMoons + "\nMass: " + model.mass.toFixed(2) + " Earth masses"
                     delay: 500
                 }
-                
+
                 MouseArea {
                     id: planetMouseArea
                     anchors.fill: parent
                     hoverEnabled: true
                     onClicked: {
-                        root.planetSelected(index)
+                        root.planetSelected(index);
                     }
                 }
             }

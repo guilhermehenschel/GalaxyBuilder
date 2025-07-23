@@ -9,6 +9,8 @@ GalaxyController::GalaxyController(QObject *parent)
     , m_galaxyGenerator(nullptr)
     , m_exporterObject(nullptr)
     , m_xmlImporter(nullptr)
+    , m_galaxyFactions(nullptr)
+    , m_galaxyFactionsViewModel(nullptr)
     , m_statusMessage("Ready")
     , m_isGenerating(false)
     , m_showSystemNames(true)
@@ -50,6 +52,13 @@ void GalaxyController::initializeModels()
     m_galaxyViewModel = new ggh::GalaxyCore::viewmodels::GalaxyViewModel(this);
     m_galaxyViewModel->setGalaxy(m_galaxyModel);
     
+    // Create the factions model
+    m_galaxyFactions = std::make_shared<ggh::Galaxy::Factions::models::GalaxyFactions>();
+    
+    // Create the factions view model and initialize it
+    m_galaxyFactionsViewModel = new ggh::Galaxy::Factions::viewmodels::GalaxyFactionsViewModel(this);
+    m_galaxyFactionsViewModel->initialize(m_galaxyFactions);
+    
     // Create the galaxy generator
     m_galaxyGenerator = new ggh::GalaxyFactories::GalaxyGenerator();
     
@@ -78,6 +87,11 @@ void GalaxyController::initializeModels()
 ggh::GalaxyCore::viewmodels::GalaxyViewModel* GalaxyController::galaxyViewModel() const
 {
     return m_galaxyViewModel;
+}
+
+ggh::Galaxy::Factions::viewmodels::GalaxyFactionsViewModel* GalaxyController::galaxyFactionsViewModel() const
+{
+    return m_galaxyFactionsViewModel;
 }
 
 ggh::GalaxyFactories::GalaxyGenerator* GalaxyController::galaxyGenerator() const

@@ -15,6 +15,9 @@ option(BUILD_QT_APP "Build Qt application" ON)
 # Include project configuration
 include(cmake/ProjectConfig.cmake)
 
+# Include QML tools for linting and formatting
+include(cmake/QmlTools.cmake)
+
 # Include third-party dependencies
 include(third_party/third_party.cmake)
 
@@ -29,6 +32,14 @@ add_subdirectory(modules)
 # Build the application if enabled
 if(BUILD_QT_APP)
     add_subdirectory(app)
+endif()
+
+# Find Qt6 tools after Qt6 is configured
+if(BUILD_QT_APP)
+    find_qt6_tools()
+    
+    # Create aggregate QML quality targets at the end
+    create_aggregate_qml_targets()
 endif()
 
 # Enable testing if requested

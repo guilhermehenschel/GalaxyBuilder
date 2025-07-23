@@ -5,7 +5,7 @@ import GalaxyCore.ViewModels
 
 Item {
     id: root
-    
+
     // Properties that will be bound from the parent
     property int systemId: 0
     property string systemName: ""
@@ -16,22 +16,22 @@ Item {
     property bool isSelected: false
     property bool showInfluenceRadius: false
     property bool showSystemNames: true
-    
+
     // Controller for handling clicks
     property GalaxyController controller
-    
+
     // Signal emitted when system is double-clicked
     signal systemDoubleClicked(int systemId)
-    
+
     // Calculate dynamic node size based on system size (radius 15-30)
     readonly property real nodeRadius: getSystemRadius(systemSize)
     readonly property real nodeDiameter: nodeRadius * 2
-    
+
     x: systemX - nodeRadius
     y: systemY - nodeRadius
     width: nodeDiameter
     height: nodeDiameter
-    
+
     // Influence radius circle
     Rectangle {
         id: influenceRadius
@@ -46,7 +46,7 @@ Item {
         border.width: 0.5
         opacity: 0.7
     }
-    
+
     // Main system visual
     Rectangle {
         id: systemDot
@@ -56,7 +56,7 @@ Item {
         color: getStarColor(systemType)
         border.color: "#ffffff"
         border.width: 1
-        
+
         // Selection indicator ring
         Rectangle {
             id: selectionRing
@@ -69,7 +69,7 @@ Item {
             color: "transparent"
             border.color: "#ff6600"
             border.width: 2
-            
+
             // Animated pulse effect for selection
             SequentialAnimation {
                 running: isSelected
@@ -90,7 +90,7 @@ Item {
                 }
             }
         }
-        
+
         // Hover effect
         Rectangle {
             id: hoverRing
@@ -105,7 +105,7 @@ Item {
             border.width: 1
             opacity: 0.8
         }
-        
+
         // Click handling
         MouseArea {
             id: mouseArea
@@ -114,22 +114,22 @@ Item {
             z: 99
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
-            
-            onClicked: (mouse)=>{
-                console.log("Single click detected - systemId:", systemId, "systemName:", systemName)
+
+            onClicked: mouse => {
+                console.log("Single click detected - systemId:", systemId, "systemName:", systemName);
                 if (controller) {
-                    controller.selectSystem(systemId)
+                    controller.selectSystem(systemId);
                 }
             }
-            
+
             onDoubleClicked: {
-                console.log("Double click detected - systemId:", systemId, "systemName:", systemName)
+                console.log("Double click detected - systemId:", systemId, "systemName:", systemName);
                 // Emit signal to let parent handle dialog
-                systemDoubleClicked(systemId)
+                systemDoubleClicked(systemId);
             }
         }
     }
-    
+
     // System name label
     Text {
         id: systemLabel
@@ -140,7 +140,7 @@ Item {
         font.bold: isSelected
         x: nodeRadius + 4  // Position relative to node size
         y: -6
-        
+
         // Add background for better readability when selected
         Rectangle {
             visible: isSelected
@@ -152,35 +152,49 @@ Item {
             z: -1
         }
     }
-    
+
     // Helper functions for visual styling
     function getStarColor(type) {
-        switch(type) {
-            case 0: return "#ff6961"  // Red Dwarf
-            case 1: return "#ffcc6f"  // Yellow Star
-            case 2: return "#9bb0ff"  // Blue Star
-            case 3: return "#ffffff"  // White Dwarf
-            case 4: return "#ffab7a"  // Red Giant
-            case 5: return "#e6e6e6"  // Neutron Star
-            case 6: return "#000000"  // Black Hole
-            default: return "#ffff80" // Default/Unknown
+        switch (type) {
+        case 0:
+            return "#ff6961";  // Red Dwarf
+        case 1:
+            return "#ffcc6f";  // Yellow Star
+        case 2:
+            return "#9bb0ff";  // Blue Star
+        case 3:
+            return "#ffffff";  // White Dwarf
+        case 4:
+            return "#ffab7a";  // Red Giant
+        case 5:
+            return "#e6e6e6";  // Neutron Star
+        case 6:
+            return "#000000";  // Black Hole
+        default:
+            return "#ffff80"; // Default/Unknown
         }
     }
-    
+
     function getSystemRadius(size) {
         // Map system size to radius between 15 and 30 pixels
-        switch(size) {
-            case 0: return 15   // Tiny
-            case 1: return 18   // Small
-            case 2: return 22   // Medium
-            case 3: return 26   // Large
-            case 4: return 30   // Huge
-            default: return 22  // Default (Medium)
+        switch (size) {
+        case 0:
+            return 15;   // Tiny
+        case 1:
+            return 18;   // Small
+        case 2:
+            return 22;   // Medium
+        case 3:
+            return 26;   // Large
+        case 4:
+            return 30;   // Huge
+        default:
+            return 22;  // Default (Medium)
         }
     }
-    
+
     // Legacy function for compatibility (now returns 1.0 since we use direct sizing)
     function getSystemScale(size) {
-        return 1.0
+        return 1.0;
     }
 }
