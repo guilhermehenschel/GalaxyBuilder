@@ -9,6 +9,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Find Qt6 components
 find_package(Qt6 6.5 REQUIRED COMPONENTS Core Qml Quick)
+qt_policy(SET QTP0001 NEW)
 
 # Automatically handle MOC, RCC, and UIC for this target
 set(CMAKE_AUTOMOC ON)

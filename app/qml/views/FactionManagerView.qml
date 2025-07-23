@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import "../components"
+import GalaxyBuilderApp 1.0
 
 /**
  * @brief Main faction management view with list and detail views
@@ -14,10 +14,7 @@ ApplicationWindow {
     height: 600
     minimumWidth: 700
     minimumHeight: 500
-    
-    Material.theme: Material.Dark
-    Material.accent: "#2196F3"
-    
+
     color: "#1e1e1e"
     
     property bool showDetailView: false
@@ -146,8 +143,7 @@ ApplicationWindow {
     
     // Status bar
     footer: ToolBar {
-        Material.theme: Material.Dark
-        
+        id: statusBar
         RowLayout {
             anchors.fill: parent
             anchors.margins: 5
@@ -173,8 +169,6 @@ ApplicationWindow {
         id: aboutDialog
         title: "About Galaxy Factions Manager"
         standardButtons: Dialog.Ok
-        
-        Material.theme: Material.Dark
         
         anchors.centerIn: parent
         width: 400

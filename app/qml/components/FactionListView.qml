@@ -1,7 +1,9 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Controls.Material
 import QtQuick.Layouts
 import Galaxy.Factions.ViewModels 1.0
+import GalaxyBuilderApp 1.0
 
 /**
  * @brief A list view component for displaying and managing factions

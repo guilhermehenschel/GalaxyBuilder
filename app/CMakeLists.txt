@@ -37,6 +37,9 @@ qt_add_qml_module(GalaxyBuilderApp
     VERSION 1.0
     QML_FILES
         qml/Main.qml
+        qml/components/FactionDetailView.qml
+        qml/components/FactionListItem.qml
+        qml/components/FactionListView.qml
         qml/components/ImportExportManager.qml
         qml/components/ParameterPanel.qml
         qml/components/PlanetDetailsDialog.qml
@@ -50,8 +53,10 @@ qt_add_qml_module(GalaxyBuilderApp
         qml/components/SystemPropertiesDialog.qml
         qml/components/SystemPropertiesManager.qml
         qml/components/GalaxyManager.qml
-        qml/views/GalaxyView.qml
         qml/components/PlanetPropertyView.qml
+        qml/views/GalaxyView.qml
+        qml/views/FactionManagerView.qml
+        
 )
 
 # Link against Qt6 and GalaxyCore
